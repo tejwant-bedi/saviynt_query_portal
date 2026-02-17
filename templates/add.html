@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Add New Query</h1>
+
+<div class="form-card">
+
+    <form method="POST">
+
+        <label>Module Name</label>
+        <input type="text" name="module" placeholder="e.g. User Management" required>
+
+        <label>Query Name</label>
+        <input type="text" name="name" placeholder="Enter query name" required>
+
+        <label>Description</label>
+        <textarea name="description" placeholder="Short explanation of what this query does"></textarea>
+
+        <label>Query Text</label>
+        <textarea name="query_text" placeholder="Paste SQL query here..." required></textarea>
+
+        <label>Comments</label>
+        <textarea name="comments" placeholder="Optional notes"></textarea>
+
+        <button type="submit" class="primary-btn">Save Query</button>
+
+    </form>
+
+</div>
+
+{% endblock %}

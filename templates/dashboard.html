@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="dashboard-header">
+    <div>
+        <h1 class="gradient-title">Saviynt Query Portal</h1>
+        <p class="subtitle">Centralized query management and analytics workspace</p>
+    </div>
+</div>
+
+<!-- STATS SECTION -->
+<div class="stats-grid two-stats">
+
+    <div class="stat-card">
+        <h2>{{ total_queries }}</h2>
+        <p>Total Queries</p>
+    </div>
+
+    <div class="stat-card">
+        <h2>{{ total_modules }}</h2>
+        <p>Total Modules</p>
+    </div>
+
+</div>
+
+<!-- RECENT QUERIES -->
+<div class="recent-section">
+    <h2>Recent Queries</h2>
+
+    {% if recent_queries %}
+        <div class="recent-grid">
+            {% for q in recent_queries[:2] %}
+            <div class="recent-card">
+                <span class="module-badge">Module: {{ q.module }}</span>
+                <h3>{{ q.name }}</h3>
+                <p class="desc">{{ q.description }}</p>
+                <div class="card-footer">
+                    <a href="/modules?module={{ q.module }}">View Module</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No queries added yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

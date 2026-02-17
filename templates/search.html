@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <h1 class="gradient-title">Search Queries</h1>
+    <p class="subtitle">Find queries using keywords across name, module or description.</p>
+</div>
+
+<div class="form-card search-card">
+    <form method="GET" class="search-form">
+        <input 
+            type="text" 
+            name="keyword" 
+            placeholder="Enter keyword..." 
+            value="{{ request.args.get('keyword','') }}"
+        >
+        <button type="submit" class="primary-btn">Search</button>
+    </form>
+</div>
+
+{% if results %}
+
+<div class="results-count">
+    <p>{{ results|length }} result(s) found</p>
+</div>
+
+<div class="recent-grid">
+    {% for q in results %}
+    <div class="card search-result-card">
+        <div class="card-header">
+        <h2>{{ q.name }}</h2>
+        <div class="module-badge">Module: {{ q.module }}</div>
+        </div>
+        <div class="detail-block">
+            <span class="label">Description</span>
+            <p>{{ q.description or "No description provided." }}</p>
+        </div>
+
+        <div class="detail-block">
+            <span class="label">SQL Query</span>
+            <pre>{{ q.query_text }}</pre>
+        </div>
+
+        <div class="detail-block">
+            <span class="label">Comments</span>
+            <p>{{ q.comments or "No comments." }}</p>
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+{% elif request.args.get('keyword') %}
+
+<div class="empty-state">
+    <h3>No results found</h3>
+    <p>Try refining your search keyword.</p>
+</div>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Modules</h1>
+
+<div class="modules-container">
+
+    <!-- Left Side: Module List -->
+    <div class="module-list">
+        <h3>All Modules</h3>
+
+        {% for m in modules %}
+            <a href="/modules?module={{ m }}"
+               class="{% if selected_module == m %}active{% endif %}">
+               {{ m }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- Right Side: Queries -->
+    <div class="module-queries">
+
+        {% if selected_module %}
+            <h2>{{ selected_module }} Queries</h2>
+
+            {% if queries %}
+                {% for q in queries %}
+                <div class="card">
+                    <h3>{{ q.name }}</h3>
+                    <p><strong>Description:</strong> {{ q.description or "No description provided."}}</p>
+                    <p><strong>Query:</strong></p>
+                    <pre>{{ q.query_text }}</pre>
+                    <p><strong>Comments:</strong> {{ q.comments or "No comments." }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No queries under this module.</p>
+            {% endif %}
+
+        {% else %}
+            <p>Select a module to view its queries.</p>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

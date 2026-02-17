@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="form-card">
+    <h2>Edit Query</h2>
+
+    <form method="POST">
+        <p>Module:</p>
+        <input type="text" name="module" value="{{ query.module }}" required>
+        <p>Name:</p>
+        <input type="text" name="name" value="{{ query.name }}" required>
+        <p>Description:</p>
+        <textarea name="description">{{ query.description }}</textarea>
+        <p>Query:</p>
+        <textarea name="query_text" required>{{ query.query_text }}</textarea>
+        <p>Comments:</p>
+        <textarea name="comments">{{ query.comments }}</textarea>
+
+        <button type="submit">Update Query</button>
+    </form>
+</div>
+
+{% endblock %}

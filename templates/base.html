@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Saviynt Query Portal</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="background-glow"></div>
+
+<div class="layout">
+
+    <div class="sidebar">
+        <div class="logo">SQP</div>
+
+        <a href="/">Dashboard</a>
+        <a href="/search">Search</a>
+        <a href="/modules">Modules</a>
+        <a href="/add">Add Query</a>
+        <a href="/manage">Modify Queries</a>
+    </div>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+</div>
+
+</body>
+</html>

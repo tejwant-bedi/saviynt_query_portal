@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Manage Queries</h1>
+
+<div class="manage-top">
+
+    <form method="GET">
+        <input type="text" name="keyword" 
+               value="{{ keyword if keyword else '' }}" 
+               placeholder="Search by name or module">
+        <button type="submit">Search</button>
+    </form>
+
+</div>
+
+{% if queries %}
+    {% for q in queries %}
+    <div class="card manage-card">
+        <div class="manage-info">
+            <h3>{{ q.name }}</h3>
+            <p class="module">{{ q.module }}</p>
+            <p>{{ q.description }}</p>
+        </div>
+
+        <div class="manage-actions">
+            <a href="/edit/{{ q.id }}" class="action-btn edit-btn">
+                Edit
+            </a>
+
+            <a href="/delete/{{ q.id }}" 
+            class="action-btn delete-btn"
+            onclick="return confirm('Are you sure?');">
+                Delete
+            </a>
+        </div>
+
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No queries found.</p>
+{% endif %}
+
+{% endblock %}
