@@ -130,6 +130,41 @@ def manage():
 
     return render_template("manage.html", queries=queries, keyword=keyword)
 
+@app.route("/debug")
+def debug():
+    queries = Query.query.all()
+
+    if not queries:
+        return "<h2>No records found.</h2>"
+
+    # Get column names dynamically
+    columns = [column.name for column in Query.__table__.columns]
+
+    html = """
+    <h1>Full Query Table</h1>
+    <div style="overflow-x:auto;">
+    <table border="1" cellpadding="8" cellspacing="0">
+        <thead>
+            <tr>
+    """
+
+    # Header row
+    for col in columns:
+        html += f"<th>{col}</th>"
+
+    html += "</tr></thead><tbody>"
+
+    # Data rows
+    for q in queries:
+        html += "<tr>"
+        for col in columns:
+            value = getattr(q, col)
+            html += f"<td>{value}</td>"
+        html += "</tr>"
+
+    html += "</tbody></table></div>"
+
+    return html
 
 # ===============================
 # EDIT QUERY
