@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <h1 class="gradient-title">Bulk Upload</h1>
+    <p class="subtitle">Upload a CSV file to add multiple queries at once.</p>
+</div>
+
+<div class="form-card">
+    <form method="POST" enctype="multipart/form-data">
+        <label>Select CSV File</label>
+        <input type="file" name="file" accept=".csv" required>
+
+        <button type="submit" class="primary-btn">Upload</button>
+    </form>
+
+    <div style="margin-top:20px; font-size:0.85rem; color:#94a3b8;">
+        <b>Required CSV Columns:</b><br>
+        module, name, description, query_text, comments
+    </div>
+</div>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div class="card" style="margin-top:20px;">
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+
+{% endblock %}
