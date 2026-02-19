@@ -24,23 +24,44 @@
     <p>{{ results|length }} result(s) found</p>
 </div>
 
-<div class="recent-grid">
+<!-- ONE COLUMN LIST -->
+<div class="results-list">
     {% for q in results %}
     <div class="card search-result-card">
+
+        <!-- Header -->
         <div class="card-header">
-        <h2>{{ q.name }}</h2>
-        <div class="module-badge">Module: {{ q.module }}</div>
+            <h2>{{ q.name }}</h2>
+            <div class="module-badge">Module: {{ q.module }}</div>
         </div>
+
+        <!-- Description -->
         <div class="detail-block">
             <span class="label">Description</span>
             <p>{{ q.description or "No description provided." }}</p>
         </div>
 
+        <!-- SQL Query -->
         <div class="detail-block">
-            <span class="label">SQL Query</span>
-            <pre>{{ q.query_text }}</pre>
+            <div class="query-header">
+                <span class="label">SQL Query</span>
+
+                <div class="query-actions">
+                    <button class="copy-btn" onclick="copyQuery('query{{ q.id }}')">
+                        Copy
+                    </button>
+                    <button class="expand-btn" onclick="toggleQuery('query{{ q.id }}', this)">
+                        +
+                    </button>
+                </div>
+            </div>
+
+            <pre id="query{{ q.id }}" class="query-preview">
+{{ q.query_text }}
+            </pre>
         </div>
 
+        <!-- Comments -->
         <div class="detail-block">
             <span class="label">Comments</span>
             <p>{{ q.comments or "No comments." }}</p>
@@ -59,4 +80,34 @@
 
 {% endif %}
 
+<script>
+function toggleQuery(id, btn) {
+    const el = document.getElementById(id);
+    el.classList.toggle("expanded");
+
+    if (el.classList.contains("expanded")) {
+        btn.textContent = "-";
+    } else {
+        btn.textContent = "+";
+    }
+}
+
+function copyQuery(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        showToast();
+    });
+}
+
+function showToast() {
+    const toast = document.getElementById("copyToast");
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2000);
+}
+</script>
+
+<div id="copyToast" class="copy-toast">Query copied!</div>
 {% endblock %}

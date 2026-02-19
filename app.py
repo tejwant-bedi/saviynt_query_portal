@@ -187,19 +187,6 @@ def edit_query(id):
 
     return render_template("edit.html", query=query)
 
-
-# ===============================
-# DELETE QUERY
-# ===============================
-
-@app.route("/delete/<int:id>")
-def delete_query(id):
-    query = Query.query.get_or_404(id)
-    db.session.delete(query)
-    db.session.commit()
-    return redirect(url_for("manage"))
-
-
 # ===============================
 # APP START
 # ===============================
