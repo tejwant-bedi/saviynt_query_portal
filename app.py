@@ -198,15 +198,37 @@ def bulk_upload():
         file = request.files.get("file")
 
         if not file or file.filename == "":
-            flash("Please select a CSV file.")
+            flash("Please select a file.")
             return redirect(url_for("bulk_upload"))
 
         try:
-            df = pd.read_csv(file)
+            filename = file.filename.lower()
 
+            # ===============================
+            # READ FILE (CSV / EXCEL)
+            # ===============================
+            if filename.endswith(".xlsx"):
+                df = pd.read_excel(file)
+
+            elif filename.endswith(".csv"):
+                # Try UTF-8 first, fallback to latin1 (Windows encoding)
+                try:
+                    df = pd.read_csv(file, encoding="utf-8")
+                except UnicodeDecodeError:
+                    file.seek(0)
+                    df = pd.read_csv(file, encoding="latin1")
+
+            else:
+                flash("Unsupported file format. Please upload CSV or XLSX.")
+                return redirect(url_for("bulk_upload"))
+
+            # ===============================
+            # INSERT DATA
+            # ===============================
             added_count = 0
 
             for _, row in df.iterrows():
+                # Skip empty names (required field)
                 if pd.isna(row.get("name")):
                     continue
 
@@ -222,7 +244,6 @@ def bulk_upload():
                 added_count += 1
 
             db.session.commit()
-
             flash(f"{added_count} queries uploaded successfully!")
 
         except Exception as e:
