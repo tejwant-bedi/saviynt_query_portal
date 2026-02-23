@@ -20,11 +20,7 @@ def normalize_text(value):
     return value.lower()
 
 def clean_text(value):
-    """
-    Removes leading/trailing spaces and extra spaces inside text.
-    Example:
-    '  User   Management  ' -> 'User Management'
-    """
+
     if not value:
         return ""
     value = str(value).strip()
@@ -216,7 +212,7 @@ def manage():
 
 @app.route("/debug")
 def debug():
-    queries = Query.query.all()
+    queries = Query.query.order_by(Query.id.desc()).all()
 
     if not queries:
         return "<h2>No records found.</h2>"
@@ -224,7 +220,7 @@ def debug():
     columns = [column.name for column in Query.__table__.columns]
 
     html = """
-    <h1>Full Query Table</h1>
+    <h1>Full Queries Table</h1>
     <div style="overflow-x:auto;">
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
