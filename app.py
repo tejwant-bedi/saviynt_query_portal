@@ -6,6 +6,7 @@ import pandas as pd
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB limit
 
 # ===============================
 # DATABASE CONFIG
@@ -190,65 +191,97 @@ def edit_query(id):
     return render_template("edit.html", query=query)
 
 # ===============================
-# BULK UPLOAD
+# BULK UPLOAD (ENTERPRISE)
 # ===============================
 @app.route("/bulk_upload", methods=["GET", "POST"])
 def bulk_upload():
     if request.method == "POST":
         file = request.files.get("file")
 
+        # 1. File presence check
         if not file or file.filename == "":
-            flash("Please select a file.")
+            flash("Please select a file to upload.")
+            return redirect(url_for("bulk_upload"))
+
+        filename = file.filename.lower()
+
+        # 2. File type validation
+        if not (filename.endswith(".csv") or filename.endswith(".xlsx")):
+            flash("Invalid file type. Please upload a CSV or XLSX file.")
             return redirect(url_for("bulk_upload"))
 
         try:
-            filename = file.filename.lower()
-
-            # ===============================
-            # READ FILE (CSV / EXCEL)
-            # ===============================
-            if filename.endswith(".xlsx"):
-                df = pd.read_excel(file)
-
-            elif filename.endswith(".csv"):
-                # Try UTF-8 first, fallback to latin1 (Windows encoding)
+            # 3. Read file (with encoding handling)
+            if filename.endswith(".csv"):
                 try:
                     df = pd.read_csv(file, encoding="utf-8")
                 except UnicodeDecodeError:
                     file.seek(0)
                     df = pd.read_csv(file, encoding="latin1")
-
             else:
-                flash("Unsupported file format. Please upload CSV or XLSX.")
+                df = pd.read_excel(file)
+
+            # 4. Empty file check
+            if df.empty:
+                flash("The uploaded file is empty.")
                 return redirect(url_for("bulk_upload"))
 
-            # ===============================
-            # INSERT DATA
-            # ===============================
-            added_count = 0
+            # Normalize column names
+            df.columns = df.columns.str.strip().str.lower()
 
+            # 5. Required columns validation
+            required_columns = {"name", "query_text"}
+            missing_columns = required_columns - set(df.columns)
+
+            if missing_columns:
+                flash(f"Missing required columns: {', '.join(missing_columns)}")
+                return redirect(url_for("bulk_upload"))
+
+            added_count = 0
+            duplicate_count = 0
+            skipped_count = 0
+
+            # 6. Process rows
             for _, row in df.iterrows():
-                # Skip empty names (required field)
-                if pd.isna(row.get("name")):
+                name = str(row.get("name", "")).strip()
+                query_text = str(row.get("query_text", "")).strip()
+
+                # Skip invalid rows
+                if not name or not query_text or name.lower() == "nan":
+                    skipped_count += 1
+                    continue
+
+                # Duplicate check (by name)
+                existing = Query.query.filter_by(name=name).first()
+                if existing:
+                    duplicate_count += 1
                     continue
 
                 new_query = Query(
                     module=str(row.get("module", "")).strip(),
-                    name=str(row.get("name", "")).strip(),
+                    name=name,
                     description=str(row.get("description", "")).strip(),
-                    query_text=str(row.get("query_text", "")).strip(),
+                    query_text=query_text,
                     comments=str(row.get("comments", "")).strip()
                 )
 
                 db.session.add(new_query)
                 added_count += 1
 
+            # 7. Commit once
             db.session.commit()
-            flash(f"{added_count} queries uploaded successfully!")
+
+            # 8. Success summary
+            flash(
+                f"Upload completed: {added_count} added, "
+                f"{duplicate_count} duplicates skipped, "
+                f"{skipped_count} invalid rows skipped."
+            )
 
         except Exception as e:
             db.session.rollback()
-            flash(f"Upload failed: {str(e)}")
+            print("Bulk upload error:", e)  # Server log
+            flash("Upload failed due to a system error. Please check the file format and try again.")
 
         return redirect(url_for("bulk_upload"))
 
