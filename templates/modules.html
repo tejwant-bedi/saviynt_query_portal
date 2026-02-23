@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1 class="gradient-title">Modules</h1>
+<div class="page-header">
+    <h1 class="gradient-title">Modules</h1>
+    <p class="subtitle">Browse queries by module.</p>
+</div>
 
 <div class="modules-container">
 
@@ -21,28 +24,99 @@
     <div class="module-queries">
 
         {% if selected_module %}
-            <h2>{{ selected_module }} Queries</h2>
 
-            {% if queries %}
-                {% for q in queries %}
-                <div class="card">
-                    <h3>{{ q.name }}</h3>
-                    <p><strong>Description:</strong> {{ q.description or "No description provided."}}</p>
-                    <p><strong>Query:</strong></p>
-                    <pre>{{ q.query_text }}</pre>
-                    <p><strong>Comments:</strong> {{ q.comments or "No comments." }}</p>
+        <div class="results-count">
+            <p>{{ queries|length }} result(s) in {{ selected_module }}</p>
+        </div>
+
+        <!-- SAME LAYOUT AS SEARCH -->
+        <div class="results-list">
+            {% for q in queries %}
+            <div class="card search-result-card">
+
+                <!-- Header -->
+                <div class="card-header">
+                    <h2>{{ q.name }}</h2>
+                    <div class="module-badge">Module: {{ q.module }}</div>
                 </div>
-                {% endfor %}
-            {% else %}
-                <p>No queries under this module.</p>
-            {% endif %}
+
+                <!-- Description -->
+                <div class="detail-block">
+                    <span class="label">Description</span>
+                    <p>{{ q.description or "No description provided." }}</p>
+                </div>
+
+                <!-- SQL Query -->
+                <div class="detail-block">
+                    <div class="query-header">
+                        <span class="label">SQL Query</span>
+
+                        <div class="query-actions">
+                            <button class="copy-btn" onclick="copyQuery('query{{ q.id }}')">
+                                Copy
+                            </button>
+                            <button class="expand-btn" onclick="toggleQuery('query{{ q.id }}', this)">
+                                +
+                            </button>
+                        </div>
+                    </div>
+
+                    <pre id="query{{ q.id }}" class="query-preview">
+{{ q.query_text }}
+                    </pre>
+                </div>
+
+                <!-- Comments -->
+                <div class="detail-block">
+                    <span class="label">Comments</span>
+                    <p>{{ q.comments or "No comments." }}</p>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
 
         {% else %}
-            <p>Select a module to view its queries.</p>
+        <div class="empty-state">
+            <h3>Select a module</h3>
+            <p>Choose a module from the left to view its queries.</p>
+        </div>
         {% endif %}
 
     </div>
 
 </div>
+
+<!-- SAME JS AS SEARCH -->
+<script>
+function toggleQuery(id, btn) {
+    const el = document.getElementById(id);
+    el.classList.toggle("expanded");
+
+    if (el.classList.contains("expanded")) {
+        btn.textContent = "-";
+    } else {
+        btn.textContent = "+";
+    }
+}
+
+function copyQuery(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        showToast();
+    });
+}
+
+function showToast() {
+    const toast = document.getElementById("copyToast");
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2000);
+}
+</script>
+
+<div id="copyToast" class="copy-toast">Query copied!</div>
 
 {% endblock %}

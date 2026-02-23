@@ -19,6 +19,39 @@ def normalize_text(value):
     # Convert to lowercase
     return value.lower()
 
+def clean_text(value):
+    """
+    Removes leading/trailing spaces and extra spaces inside text.
+    Example:
+    '  User   Management  ' -> 'User Management'
+    """
+    if not value:
+        return ""
+    value = str(value).strip()
+    value = re.sub(r"\s+", " ", value)
+    return value
+
+def clean_query_text(query_text):
+    if not query_text:
+        return ""
+
+    # Convert Windows/Mac line endings to Unix
+    query_text = query_text.replace('\r\n', '\n').replace('\r', '\n')
+
+    # Remove trailing spaces from each line
+    lines = [line.strip() for line in query_text.split('\n')]
+
+    # Remove empty lines
+    lines = [line for line in lines if line]
+
+    # Join back with single line breaks
+    query_text = '\n'.join(lines)
+
+    # Replace multiple spaces with single space (but keep indentation for SQL)
+    query_text = re.sub(r'[ \t]+', ' ', query_text)
+
+    return query_text.strip()
+
 # ===============================
 # DATABASE CONFIG
 # ===============================
@@ -110,11 +143,11 @@ def add_query():
     if request.method == "POST":
         try:
             # 1. Get and clean input
-            module = request.form.get("module", "").strip()
-            name = request.form.get("name", "").strip()
-            description = request.form.get("description", "").strip()
-            query_text = request.form.get("query_text", "").strip()
-            comments = request.form.get("comments", "").strip()
+            module = clean_text(request.form.get("module", ""))
+            name = clean_text(request.form.get("name", ""))
+            description = clean_text(request.form.get("description", ""))
+            comments = clean_text(request.form.get("comments", ""))
+            query_text = clean_query_text(request.form.get("query_text", ""))
 
             # 2. Validation
             if not name or not query_text:
@@ -256,11 +289,11 @@ def edit_query(id):
     query = Query.query.get_or_404(id)
 
     if request.method == "POST":
-        query.module = request.form["module"]
-        query.name = request.form["name"]
-        query.description = request.form["description"]
-        query.query_text = request.form["query_text"]
-        query.comments = request.form["comments"]
+        query.module = clean_text(request.form["module"])
+        query.name = clean_text(request.form["name"])
+        query.description = clean_text(request.form["description"])
+        query.query_text = clean_query_text(request.form["query_text"])
+        query.comments = clean_text(request.form["comments"])
 
         db.session.commit()
 
@@ -333,7 +366,7 @@ def bulk_upload():
             # 7. Process rows
             for _, row in df.iterrows():
                 name = str(row.get("name", "")).strip()
-                query_text = str(row.get("query_text", "")).strip()
+                query_text = clean_query_text(str(row.get("query_text", "")).strip())
                 module = str(row.get("module", "")).strip()
 
                 # Skip invalid rows
