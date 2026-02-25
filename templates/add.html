@@ -16,6 +16,19 @@
         <label>Description</label>
         <textarea name="description" placeholder="Short explanation of what this query does"></textarea>
 
+        <label>Dynamic Input</label>
+        <textarea name="dynamic_input" placeholder="e.g. userkey, accountkey"></textarea>
+
+        <label for="execute_in">Execute In</label>
+
+        <div class="custom-select-wrapper">
+            <select id="execute_in" name="execute_in" class="custom-select" required>
+                <option value="" disabled selected>Select execution scope</option>
+                <option value="Data Analyzer, Analytics">Data Analyzer + Analytics</option>
+                <option value="Analytics">Analytics Only</option>
+            </select>
+        </div>
+
         <label>Query Text</label>
         <textarea name="query_text" placeholder="Paste SQL query here..." required></textarea>
 

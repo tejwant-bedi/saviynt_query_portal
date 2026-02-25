@@ -25,11 +25,6 @@
 
         {% if selected_module %}
 
-        <div class="results-count">
-            <p>{{ queries|length }} result(s) in {{ selected_module }}</p>
-        </div>
-
-        <!-- SAME LAYOUT AS SEARCH -->
         <div class="results-list">
             {% for q in queries %}
             <div class="card search-result-card">
@@ -45,6 +40,19 @@
                     <span class="label">Description</span>
                     <p>{{ q.description or "No description provided." }}</p>
                 </div>
+
+                <!-- Dynamic Input -->
+                <div class="detail-block">
+                    <span class="label">Dynamic Input</span>
+                    <p>{{ q.dynamic_input or "None" }}</p>
+                </div>
+
+                <!-- Execute In -->
+                <div class="detail-block">
+                    <span class="label">Execute in</span>
+                    <p>{{ q.execute_in or "Not specified" }}</p>
+                </div>
+
 
                 <!-- SQL Query -->
                 <div class="detail-block">
@@ -87,7 +95,6 @@
 
 </div>
 
-<!-- SAME JS AS SEARCH -->
 <script>
 function toggleQuery(id, btn) {
     const el = document.getElementById(id);

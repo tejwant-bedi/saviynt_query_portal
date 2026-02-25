@@ -8,4 +8,6 @@ class Query(db.Model):
     description = db.Column(db.Text)
     query_text = db.Column(db.Text, nullable=False)
     comments = db.Column(db.Text)
+    dynamic_input = db.Column(db.Text)
+    execute_in = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

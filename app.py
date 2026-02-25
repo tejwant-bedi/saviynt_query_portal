@@ -1,5 +1,5 @@
 import os
-from flask import Flask, flash, render_template, request, redirect, url_for
+from flask import Flask, flash, render_template, request, redirect, url_for, session
 from sqlalchemy import or_
 from extensions import db
 import pandas as pd
@@ -97,7 +97,6 @@ def search_page():
                 Query.name.ilike(f"%{keyword}%"),
                 Query.module.ilike(f"%{keyword}%"),
                 Query.description.ilike(f"%{keyword}%"),
-                Query.query_text.ilike(f"%{keyword}%")
             )
         ).order_by(Query.created_at.desc()).all()
 
@@ -144,10 +143,16 @@ def add_query():
             description = clean_text(request.form.get("description", ""))
             comments = clean_text(request.form.get("comments", ""))
             query_text = clean_query_text(request.form.get("query_text", ""))
+            dynamic_input=clean_text(request.form.get("dynamic_input"))
+            execute_in=request.form.get("execute_in")
 
             # 2. Validation
             if not name or not query_text:
                 flash("Name and Query Text are required.")
+                return redirect(url_for("add_query"))
+            allowed_scopes = ["Data Analyzer, Analytics", "Analytics"]
+            if execute_in not in allowed_scopes:
+                flash("Invalid value for 'Execute in'")
                 return redirect(url_for("add_query"))
 
             # 3. Normalize name for duplicate check
@@ -168,7 +173,9 @@ def add_query():
                 name=name,
                 description=description,
                 query_text=query_text,
-                comments=comments
+                comments=comments,
+                dynamic_input=dynamic_input,
+                execute_in=execute_in
             )
 
             db.session.add(new_query)
@@ -187,7 +194,7 @@ def add_query():
     return render_template("add.html")
 
 # ===============================
-# MANAGE PAGE (EDIT/DELETE + SEARCH)
+# MANAGE PAGE 
 # ===============================
 
 @app.route("/manage")
@@ -285,10 +292,19 @@ def edit_query(id):
     query = Query.query.get_or_404(id)
 
     if request.method == "POST":
+        allowed_scopes = ["Data Analyzer, Analytics", "Analytics"]
+        execute_in = request.form.get("execute_in")
+
+        if execute_in not in allowed_scopes:
+            flash("Invalid value for 'Execute in'")
+            return redirect(url_for("edit_query", id=id))
+        
         query.module = clean_text(request.form["module"])
         query.name = clean_text(request.form["name"])
         query.description = clean_text(request.form["description"])
         query.query_text = clean_query_text(request.form["query_text"])
+        query.execute_in = clean_text(request.form["execute_in"])
+        query.dynamic_input = clean_text(request.form["dynamic_input"])
         query.comments = clean_text(request.form["comments"])
 
         db.session.commit()
@@ -305,20 +321,18 @@ def bulk_upload():
     if request.method == "POST":
         file = request.files.get("file")
 
-        # 1. File presence check
         if not file or file.filename == "":
             flash("Please select a file to upload.")
             return redirect(url_for("bulk_upload"))
 
         filename = file.filename.lower()
 
-        # 2. File type validation
         if not (filename.endswith(".csv") or filename.endswith(".xlsx")):
             flash("Invalid file type. Please upload a CSV or XLSX file.")
             return redirect(url_for("bulk_upload"))
 
         try:
-            # 3. Read file with encoding fallback
+            # Read file
             if filename.endswith(".csv"):
                 try:
                     df = pd.read_csv(file, encoding="utf-8")
@@ -328,7 +342,6 @@ def bulk_upload():
             else:
                 df = pd.read_excel(file)
 
-            # 4. Empty file check
             if df.empty:
                 flash("The uploaded file is empty.")
                 return redirect(url_for("bulk_upload"))
@@ -336,7 +349,6 @@ def bulk_upload():
             # Normalize column names
             df.columns = df.columns.str.strip().str.lower()
 
-            # 5. Required columns validation
             required_columns = {"name", "query_text"}
             missing_columns = required_columns - set(df.columns)
 
@@ -347,69 +359,102 @@ def bulk_upload():
             added_count = 0
             duplicate_count = 0
             skipped_count = 0
+            row_errors = []
 
-            # 6. Load existing queries once (performance optimization)
+            # Load existing queries once
             existing_queries = Query.query.all()
+            existing_set = {
+                (normalize_text(q.name), normalize_text(q.module))
+                for q in existing_queries
+            }
 
-            existing_set = set()
-            for q in existing_queries:
-                key = (
-                    normalize_text(q.name),
-                    normalize_text(q.module)
-                )
-                existing_set.add(key)
+            allowed_scopes = ["Data Analyzer, Analytics", "Analytics"]
 
-            # 7. Process rows
-            for _, row in df.iterrows():
-                name = str(row.get("name", "")).strip()
-                query_text = clean_query_text(str(row.get("query_text", "")).strip())
-                module = str(row.get("module", "")).strip()
+            # Process rows
+            for index, row in df.iterrows():
+                row_number = index + 2  # +2 because Excel header is row 1
 
-                # Skip invalid rows
-                if not name or not query_text or name.lower() == "nan":
+                try:
+                    name = clean_text(str(row.get("name", "")))
+                    module = clean_text(str(row.get("module", "")))
+                    query_text = clean_query_text(str(row.get("query_text", "")))
+                    description = clean_text(str(row.get("description", "")))
+                    comments = clean_text(str(row.get("comments", "")))
+                    dynamic_input = clean_text(str(row.get("dynamic_input", "")))
+                    execute_in = clean_text(str(row.get("execute_in", "")))
+
+                    # Validation: name/query
+                    if not name or name.lower() == "nan":
+                        skipped_count += 1
+                        row_errors.append(f"Row {row_number}: Missing query name")
+                        continue
+
+                    if not query_text or query_text.lower() == "nan":
+                        skipped_count += 1
+                        row_errors.append(f"Row {row_number}: Missing query_text")
+                        continue
+
+                    # Duplicate check
+                    key = (normalize_text(name), normalize_text(module))
+                    if key in existing_set:
+                        duplicate_count += 1
+                        row_errors.append(f"Row {row_number}: Duplicate (name + module)")
+                        continue
+
+                    # Execute scope validation
+                    if execute_in and execute_in not in allowed_scopes:
+                        skipped_count += 1
+                        row_errors.append(
+                            f"Row {row_number}: Invalid Execute in value -> '{execute_in}'"
+                        )
+                        continue
+
+                    # Insert
+                    new_query = Query(
+                        module=module,
+                        name=name,
+                        description=description,
+                        query_text=query_text,
+                        comments=comments,
+                        dynamic_input=dynamic_input,
+                        execute_in=execute_in
+                    )
+
+                    db.session.add(new_query)
+                    existing_set.add(key)
+                    added_count += 1
+
+                except Exception as row_error:
                     skipped_count += 1
-                    continue
+                    row_errors.append(
+                        f"Row {row_number}: System error -> {str(row_error)}"
+                    )
 
-                # Normalize for duplicate check
-                normalized_key = (
-                    normalize_text(name),
-                    normalize_text(module)
-                )
-
-                if normalized_key in existing_set:
-                    duplicate_count += 1
-                    continue
-
-                new_query = Query(
-                    module=module,
-                    name=name,
-                    description=str(row.get("description", "")).strip(),
-                    query_text=query_text,
-                    comments=str(row.get("comments", "")).strip()
-                )
-
-                db.session.add(new_query)
-                existing_set.add(normalized_key)
-                added_count += 1
-
-            # 8. Commit once
             db.session.commit()
 
-            # 9. Summary message
+            # Summary
             flash(
                 f"Upload completed: {added_count} added, "
-                f"{duplicate_count} duplicates skipped, "
-                f"{skipped_count} invalid rows skipped."
+                f"{duplicate_count} duplicates, "
+                f"{skipped_count} skipped."
             )
+
+            # Store row errors (limit to avoid huge UI)
+            if row_errors:
+                session["bulk_errors"] = row_errors[:100]
+            else:
+                session.pop("bulk_errors", None)
 
         except Exception as e:
             db.session.rollback()
             print("Bulk upload error:", e)
-            flash("Upload failed due to a system error. Please check the file format and try again.")
+            flash("Upload failed due to a system error.")
 
         return redirect(url_for("bulk_upload"))
 
-    return render_template("bulk_upload.html")
+    # GET request
+    errors = session.pop("bulk_errors", None)
+    return render_template("bulk_upload.html", errors=errors)
 
 # ===============================
 # APP START

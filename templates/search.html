@@ -41,6 +41,18 @@
             <p>{{ q.description or "No description provided." }}</p>
         </div>
 
+        <!-- Dynamic Input -->
+        <div class="detail-block">
+            <span class="label">Dynamic Input</span>
+            <p>{{ q.dynamic_input or "None" }}</p>
+        </div>
+
+        <!-- Execute In -->
+        <div class="detail-block">
+            <span class="label">Execute in</span>
+            <p>{{ q.execute_in or "Not specified" }}</p>
+        </div>
+
         <!-- SQL Query -->
         <div class="detail-block">
             <div class="query-header">

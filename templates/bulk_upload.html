@@ -22,12 +22,26 @@
 
 {% with messages = get_flashed_messages() %}
 {% if messages %}
-    <div class="card" style="margin-top:20px;">
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    </div>
+<div class="card" style="margin-top:20px;">
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+</div>
 {% endif %}
 {% endwith %}
+
+{% if errors %}
+<div class="card" style="margin-top:20px;">
+    <h3>Row Errors</h3>
+    <div style="max-height:300px; overflow:auto; font-size:0.9rem;">
+        <ul>
+        {% for err in errors %}
+            <li>{{ err }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    <p style="color:#94a3b8;">Showing first 100 errors only.</p>
+</div>
+{% endif %}
 
 {% endblock %}
