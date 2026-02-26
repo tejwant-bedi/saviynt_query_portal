@@ -12,13 +12,32 @@
         <p>Description:</p>
         <textarea name="description">{{ query.description }}</textarea>
         <p>Execute in</p>
-        <div class="custom-select-wrapper">
-            <select id="execute_in" name="execute_in" class="custom-select" required>
-                <option value="" disabled selected>Select execution scope</option>
-                <option value="Data Analyzer, Analytics">Data Analyzer + Analytics</option>
-                <option value="Analytics">Analytics Only</option>
-            </select>
-        </div>
+            <div class="custom-select-wrapper">
+                <select name="execute_in" class="custom-select">
+
+                    <!-- Default option -->
+                    <option value=""
+                        {% if not query.execute_in %}selected{% endif %}>
+                        Select execution scope
+                    </option>
+
+                    <option value="Data Analyzer"
+                        {% if query.execute_in == "Data Analyzer" %}selected{% endif %}>
+                        Data Analyzer
+                    </option>
+
+                    <option value="Analytics"
+                        {% if query.execute_in == "Analytics" %}selected{% endif %}>
+                        Analytics
+                    </option>
+
+                    <option value="Data Analyzer, Analytics"
+                        {% if query.execute_in == "Data Analyzer, Analytics" %}selected{% endif %}>
+                        Data Analyzer + Analytics
+                    </option>
+
+                </select>
+            </div>
         <p>Dynamic Input</p>
         <textarea name="dynamic_input">{{ query.dynamic_input }}</textarea>
         <p>Query:</p>
