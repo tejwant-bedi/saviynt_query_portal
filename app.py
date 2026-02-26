@@ -1,9 +1,10 @@
 import os
 from flask import Flask, flash, render_template, request, redirect, url_for, session
-from sqlalchemy import or_
+from sqlalchemy import or_,asc
 from extensions import db
 import pandas as pd
 import re
+from glossary_data import glossary_data
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
@@ -112,7 +113,13 @@ def modules():
     selected_module = request.args.get("module")
 
     # Get all unique modules
-    modules = db.session.query(Query.module).distinct().all()
+
+    modules = (
+        db.session.query(Query.module)
+        .distinct()
+        .order_by(asc(Query.module))
+        .all()
+    )
     modules = [m[0] for m in modules]
 
     queries = []
@@ -455,6 +462,25 @@ def bulk_upload():
     # GET request
     errors = session.pop("bulk_errors", None)
     return render_template("bulk_upload.html", errors=errors)
+
+# ===============================
+# GLOSSARY
+# ===============================
+
+@app.route("/glossary")
+def glossary():
+    
+    selected_section = request.args.get("section")
+
+    sections = sorted(glossary_data.keys())
+    items = glossary_data.get(selected_section)
+
+    return render_template(
+        "glossary.html",
+        sections=sections,
+        selected_section=selected_section,
+        items=items
+    )
 
 # ===============================
 # APP START

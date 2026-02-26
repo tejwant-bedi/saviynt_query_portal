@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <h1 class="gradient-title">Saviynt Glossary</h1>
+    <p class="subtitle">Browse system codes and reference values.</p>
+</div>
+    <input type="text" id="glossarySearch" placeholder="Search section..."
+       class="search-input">
+
+<div class="modules-container">
+
+    <!-- Left Panel (like Modules) -->
+    <div class="module-list">
+        <h2>Sections</h2>
+
+        {% for s in sections %}
+            <a href="/glossary?section={{ s }}"
+               class="{% if selected_section == s %}active{% endif %}">
+               {{ s }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- Right Panel -->
+    <div class="module-queries">
+
+        {% if selected_section %}
+
+            <div class="card">
+                <h2>{{ selected_section }}</h2>
+
+                {% if items %}
+                <table class="glossary-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for name, value in items.items() %}
+                        <tr>
+                            <td>{{ name }}</td>
+                            <td>{{ value }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p>No data available.</p>
+                {% endif %}
+            </div>
+
+        {% else %}
+            <div class="empty-state">
+                <h3>Select a section</h3>
+                <p>Choose a glossary section from the left.</p>
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<script>
+function filterGlossary() {
+    let input = document.getElementById("glossarySearch").value.toLowerCase();
+    let items = document.querySelectorAll(".module-list a");
+
+    items.forEach(item => {
+        if (item.textContent.toLowerCase().includes(input)) {
+            item.style.display = "block";
+        } else {
+            item.style.display = "none";
+        }
+    });
+}
+
+document.getElementById("glossarySearch")
+        .addEventListener("keyup", filterGlossary);
+</script>
+
+{% endblock %}
