@@ -174,7 +174,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    color: #38bdf8;
+    margin-bottom: 30px;
 }
 
 .card-header h3 {
@@ -330,11 +331,24 @@ button:hover {
 
 .label {
     display: block;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #38bdf8;
-    margin-bottom: 6px;
+    font-size: 1.0rem;
+    font-weight: 600;
+    color: #f5f7f9;      
+    margin-bottom: 20px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;  
+}
+
+.detail-block p {
+    font-size: 0.90rem;
+    font-weight: 400;
+    color: #afd0ff;     
+    margin: 20px;
+    line-height: 1.5;
+}
+
+.detail-block:last-child {
+    border-bottom: none;
 }
 
 .empty-state {
@@ -462,6 +476,8 @@ pre {
     border-radius: 6px;
     white-space: pre-wrap;
     transition: max-height 0.3s ease;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .query-preview.expanded {
@@ -628,3 +644,4 @@ pre {
 .modules-container {
     margin-top: 10px;
 }
+
