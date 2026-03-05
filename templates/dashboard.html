@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="dashboard-header">
-    <div>
+<div class="page-header dashboard-header">
+
+    <div class="header-left">
         <h1 class="gradient-title">Saviynt Query Portal</h1>
-        <p class="subtitle">Centralized query management and analytics workspace</p>
+        <p class="subtitle">Search and explore Saviynt SQL queries.</p>
     </div>
+
+    {% if not session.get("admin") %}
+    <a href="/admin-login" class="admin-login-btn">Admin Login</a>
+    {% endif %}
+
 </div>
 
 <!-- STATS SECTION -->
@@ -44,5 +50,4 @@
         <p>No queries added yet.</p>
     {% endif %}
 </div>
-
 {% endblock %}

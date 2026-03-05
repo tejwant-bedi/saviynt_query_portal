@@ -17,10 +17,26 @@
         <a href="/glossary">Glossary</a>
         <a href="/search">Search</a>
         <a href="/modules">Modules</a>
-        <a href="/add">Add Query</a>
-        <a href="/manage">Modify Queries</a>
-        <a href="/bulk_upload">Bulk Upload</a>
+        {% if session.get("admin") %}
 
+        <div class="admin-sidebar">
+
+            <div class="admin-header">
+                <h3>Admin</h3>
+            </div>
+
+            <a href="/add" class="admin-link">Add Query</a>
+            <a href="/manage" class="admin-link">Modify Queries</a>
+            <a href="/bulk_upload" class="admin-link">Bulk Upload</a>
+            <a href="/debug" class="admin-link">Debug Tool</a>
+
+            <div class="admin-divider"></div>
+
+            <a href="/admin-logout" class="admin-link logout">Logout</a>
+
+        </div>
+
+        {% endif %}
     </div>
 
     <div class="content">

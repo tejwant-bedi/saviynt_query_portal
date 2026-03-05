@@ -5,10 +5,50 @@ from extensions import db
 import pandas as pd
 import re
 from glossary_data import glossary_data
+from functools import wraps
+from datetime import timedelta
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
+app.permanent_session_lifetime = timedelta(minutes=10)
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB limit
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "saviynt123")
+
+@app.route("/admin-login", methods=["GET", "POST"])
+def admin_login():
+    error = None
+
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            session.permanent = True
+            session["admin"] = True
+            return redirect(url_for("dashboard"))
+        else:
+            error = "Invalid credentials"
+
+    return render_template("admin_login.html", error=error)
+
+@app.before_request
+def refresh_admin_session():
+    if session.get("admin"):
+        session.permanent = True
+
+@app.route("/admin-logout")
+def admin_logout():
+    session.pop("admin", None)
+    return redirect(url_for("dashboard"))
+
+def admin_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not session.get("admin"):
+            return redirect(url_for("admin_login"))
+        return f(*args, **kwargs)
+    return wrapper
 
 def normalize_text(value):
     if not value:
@@ -32,19 +72,14 @@ def clean_query_text(query_text):
     if not query_text:
         return ""
 
-    # Convert Windows/Mac line endings to Unix
     query_text = query_text.replace('\r\n', '\n').replace('\r', '\n')
 
-    # Remove trailing spaces from each line
     lines = [line.strip() for line in query_text.split('\n')]
 
-    # Remove empty lines
     lines = [line for line in lines if line]
 
-    # Join back with single line breaks
     query_text = '\n'.join(lines)
 
-    # Replace multiple spaces with single space (but keep indentation for SQL)
     query_text = re.sub(r'[ \t]+', ' ', query_text)
 
     return query_text.strip()
@@ -141,6 +176,7 @@ def modules():
 # ===============================
 
 @app.route("/add", methods=["GET", "POST"])
+@admin_required
 def add_query():
     if request.method == "POST":
         try:
@@ -205,6 +241,7 @@ def add_query():
 # ===============================
 
 @app.route("/manage")
+@admin_required
 def manage():
     keyword = request.args.get("keyword")
 
@@ -225,6 +262,7 @@ def manage():
 # ===============================
 
 @app.route("/debug")
+@admin_required
 def debug():
     queries = Query.query.order_by(Query.id.desc()).all()
 
@@ -233,51 +271,18 @@ def debug():
 
     columns = [column.name for column in Query.__table__.columns]
 
-    html = """
-    <h1>Full Queries Table</h1>
-    <div style="overflow-x:auto;">
-    <table border="1" cellpadding="8" cellspacing="0">
-        <thead>
-            <tr>
-    """
-
-    # Header row
-    for col in columns:
-        html += f"<th>{col}</th>"
-
-    html += "<th>Action</th>"
-    html += "</tr></thead><tbody>"
-
-    # Data rows
-    for q in queries:
-        html += "<tr>"
-        for col in columns:
-            value = getattr(q, col)
-            html += f"<td>{value}</td>"
-
-        # Delete button (POST form)
-        html += f"""
-        <td>
-            <form method="POST" action="/delete_debug/{q.id}" 
-                  onsubmit="return confirm('Delete this query?');">
-                <button style="background:#dc3545;color:white;border:none;padding:5px 10px;cursor:pointer;">
-                    Delete
-                </button>
-            </form>
-        </td>
-        """
-
-        html += "</tr>"
-
-    html += "</tbody></table></div>"
-
-    return html
+    return render_template(
+        "debug.html",
+        queries=queries,
+        columns=columns
+    )
 
 # ===============================
 # DELETE FROM DEBUG
 # ===============================
 
 @app.route("/delete_debug/<int:id>", methods=["POST"])
+@admin_required
 def delete_debug(id):
     query = Query.query.get_or_404(id)
 
@@ -295,6 +300,7 @@ def delete_debug(id):
 # ===============================
 
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
+@admin_required
 def edit_query(id):
     query = Query.query.get_or_404(id)
 
@@ -324,6 +330,7 @@ def edit_query(id):
 # BULK UPLOAD 
 # ===============================
 @app.route("/bulk_upload", methods=["GET", "POST"])
+@admin_required
 def bulk_upload():
     if request.method == "POST":
         file = request.files.get("file")
