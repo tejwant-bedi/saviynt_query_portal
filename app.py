@@ -258,12 +258,12 @@ def manage():
     return render_template("manage.html", queries=queries, keyword=keyword)
 
 # ===============================
-# DEBUG
+# QUERIES_TABLE
 # ===============================
 
-@app.route("/debug")
+@app.route("/queries_table")
 @admin_required
-def debug():
+def queries_table():
     queries = Query.query.order_by(Query.id.desc()).all()
 
     if not queries:
@@ -272,18 +272,18 @@ def debug():
     columns = [column.name for column in Query.__table__.columns]
 
     return render_template(
-        "debug.html",
+        "queries_table.html",
         queries=queries,
         columns=columns
     )
 
 # ===============================
-# DELETE FROM DEBUG
+# DELETE FROM QUERIES_TABLE
 # ===============================
 
-@app.route("/delete_debug/<int:id>", methods=["POST"])
+@app.route("/delete_queries_table/<int:id>", methods=["POST"])
 @admin_required
-def delete_debug(id):
+def delete_queries_table(id):
     query = Query.query.get_or_404(id)
 
     try:
@@ -293,7 +293,7 @@ def delete_debug(id):
         db.session.rollback()
         print("Delete error:", e)
 
-    return redirect(url_for("debug"))
+    return redirect(url_for("queries_table"))
 
 # ===============================
 # EDIT QUERY

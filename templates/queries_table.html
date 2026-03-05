@@ -2,11 +2,11 @@
 {% block content %}
 
 <div class="page-header">
-    <h1 class="gradient-title">Debug Tool</h1>
+    <h1 class="gradient-title">Queries Table</h1>
     <p class="subtitle">Full query table for debugging and maintenance.</p>
 </div>
-<div class="debug-table-container">
-    <table class="debug-table">
+<div class="queries_table-table-container">
+    <table class="queries_table-table">
 
         <thead>
             <tr>
@@ -26,7 +26,7 @@
                 {% endfor %}
 
                 <td>
-                    <form method="POST" action="/delete_debug/{{ q.id }}"
+                    <form method="POST" action="/delete_queries_table/{{ q.id }}"
                           onsubmit="return confirm('Delete this query?');">
 
                         <button class="delete-btn">
