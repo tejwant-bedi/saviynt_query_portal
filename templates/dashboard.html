@@ -8,9 +8,16 @@
         <p class="subtitle">Search and explore Saviynt SQL queries.</p>
     </div>
 
-    {% if not session.get("admin") %}
-    <a href="/admin-login" class="admin-login-btn">Admin Login</a>
-    {% endif %}
+    <div class="header-right">
+
+        <div class="logo-box">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" class="header-logo">
+        </div>
+        {% if not session.get("admin") %}
+        <a href="/admin-login" class="admin-login-btn">Admin Login</a>
+        {% endif %}
+
+    </div>
 
 </div>
 

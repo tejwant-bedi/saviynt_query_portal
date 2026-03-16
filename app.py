@@ -1,5 +1,5 @@
 import os
-from flask import Flask, flash, render_template, request, redirect, url_for, session
+from flask import Flask, flash, render_template, request, redirect, url_for, session, Response
 from sqlalchemy import or_,asc
 from extensions import db
 import pandas as pd
@@ -7,6 +7,8 @@ import re
 from glossary_data import glossary_data
 from functools import wraps
 from datetime import timedelta
+import csv
+from io import StringIO
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
@@ -488,6 +490,63 @@ def glossary():
         selected_section=selected_section,
         items=items
     )
+    
+# ===============================
+# EXPORT
+# ===============================
+
+@app.route("/export")
+@admin_required
+def export_queries():
+
+    queries = Query.query.all()
+
+    output = StringIO()
+
+    # Excel UTF-8 fix
+    output.write('\ufeff')
+
+    writer = csv.writer(
+        output,
+        delimiter=",",
+        quoting=csv.QUOTE_ALL
+    )
+
+    # Exact bulk upload header
+    writer.writerow([
+        "module",
+        "name",
+        "description",
+        "dynamic_input",
+        "execute_in",
+        "query_text",
+        "comments"
+    ])
+
+    for q in queries:
+
+        # Fix non-breaking space issue
+        query_text = q.query_text.replace("\u00A0", " ") if q.query_text else ""
+
+        writer.writerow([
+            q.module,
+            q.name,
+            q.description,
+            q.dynamic_input,
+            q.execute_in,
+            query_text,
+            q.comments
+        ])
+
+    output.seek(0)
+
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": "attachment; filename=queries_export.csv"
+        }
+    )
 
 # ===============================
 # APP START
@@ -498,3 +557,4 @@ with app.app_context():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
