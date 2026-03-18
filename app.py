@@ -491,62 +491,61 @@ def glossary():
         items=items
     )
     
-# ===============================
-# EXPORT
-# ===============================
-
-@app.route("/export")
+@app.route("/export", methods=["GET", "POST"])
 @admin_required
 def export_queries():
 
-    queries = Query.query.all()
+    # 👉 If user clicks download
+    if request.method == "POST":
 
-    output = StringIO()
+        queries = Query.query.all()
 
-    # Excel UTF-8 fix
-    output.write('\ufeff')
+        output = StringIO()
 
-    writer = csv.writer(
-        output,
-        delimiter=",",
-        quoting=csv.QUOTE_ALL
-    )
+        # Excel UTF-8 fix
+        output.write('\ufeff')
 
-    # Exact bulk upload header
-    writer.writerow([
-        "module",
-        "name",
-        "description",
-        "dynamic_input",
-        "execute_in",
-        "query_text",
-        "comments"
-    ])
+        writer = csv.writer(
+            output,
+            delimiter=",",
+            quoting=csv.QUOTE_ALL
+        )
 
-    for q in queries:
-
-        # Fix non-breaking space issue
-        query_text = q.query_text.replace("\u00A0", " ") if q.query_text else ""
-
+        # Exact bulk upload header
         writer.writerow([
-            q.module,
-            q.name,
-            q.description,
-            q.dynamic_input,
-            q.execute_in,
-            query_text,
-            q.comments
+            "module",
+            "name",
+            "description",
+            "dynamic_input",
+            "execute_in",
+            "query_text",
+            "comments"
         ])
 
-    output.seek(0)
+        for q in queries:
+            query_text = q.query_text.replace("\u00A0", " ") if q.query_text else ""
 
-    return Response(
-        output.getvalue(),
-        mimetype="text/csv; charset=utf-8",
-        headers={
-            "Content-Disposition": "attachment; filename=queries_export.csv"
-        }
-    )
+            writer.writerow([
+                q.module,
+                q.name,
+                q.description,
+                q.dynamic_input,
+                q.execute_in,
+                query_text,
+                q.comments
+            ])
+
+        output.seek(0)
+
+        return Response(
+            output.getvalue(),
+            mimetype="text/csv; charset=utf-8",
+            headers={
+                "Content-Disposition": "attachment; filename=queries_export.csv"
+            }
+        )
+
+    return render_template("export.html")
 
 # ===============================
 # APP START

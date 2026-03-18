@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+
+    <div class="header-left">
+        <h1 class="gradient-title">Export Queries</h1>
+        <p class="subtitle">Download all stored queries in CSV format.</p>
+    </div>
+
+</div>
+
+<div class="export-section">
+
+    <div class="export-card">
+
+        <div class="export-info">
+            <h3>CSV Export</h3>
+            <p>Includes all fields exactly as stored in the system.</p>
+        </div>
+
+        <form method="POST" onsubmit="return handleExport(this)">
+            <button type="submit" class="export-btn">
+                ⬇ Download CSV
+            </button>
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+function handleExport(form){
+    const confirmDownload = confirm("Do you want to download the queries CSV?");
+    if(!confirmDownload) return false;
+
+    const btn = form.querySelector("button");
+    btn.innerText = "Exporting...";
+    btn.disabled = true;
+
+    return true;
+}
+</script>
+
+{% endblock %}
