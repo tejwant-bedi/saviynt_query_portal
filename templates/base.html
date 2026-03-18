@@ -11,37 +11,73 @@
 
 <div class="layout">
 
-    <div class="sidebar">
-        <div class="logo">SQP</div>
-        <a href="/">Dashboard</a>
-        <a href="/glossary">Glossary</a>
-        <a href="/search">Search</a>
-        <a href="/modules">Modules</a>
-        {% if session.get("admin") %}
+        <div class="sidebar" id="sidebar">
 
-        <div class="admin-sidebar">
-
-            <div class="admin-header">
-                <h3>Admin</h3>
+            <div class="sidebar-top">
+                <a href="/" class="logo">SQP</a>
             </div>
 
-            <a href="/add" class="admin-link">Add Query</a>
-            <a href="/manage" class="admin-link">Modify Queries</a>
-            <a href="/bulk_upload" class="admin-link">Bulk Upload</a>
-            <a href="/export" class="admin-link"
-                onclick="return confirm('Do you want to download the queries CSV?')">
-                Export CSV
-            </a>
-            <a href="/queries_table" class="admin-link">Queries Table</a>
+            <div class="nav">
 
-            <div class="admin-divider"></div>
+                <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}" title="Dashboard">
+                    <span class="icon">🏠</span>
+                    <span class="text">Dashboard</span>
+                </a>
 
-            <a href="/admin-logout" class="admin-link logout">Logout</a>
+                <a href="/glossary" class="nav-item {% if request.path == '/glossary' %}active{% endif %}" title="Glossary">
+                    <span class="icon">📘</span>
+                    <span class="text">Glossary</span>
+                </a>
+
+                <a href="/search" class="nav-item {% if request.path == '/search' %}active{% endif %}" title="Search">
+                    <span class="icon">🔍</span>
+                    <span class="text">Search</span>
+                </a>
+
+                <a href="/modules" class="nav-item {% if request.path == '/modules' %}active{% endif %}" title="Modules">
+                    <span class="icon">🧩</span>
+                    <span class="text">Modules</span>
+                </a>
+
+                {% if session.get("admin") %}
+
+                <div class="admin-section">
+                    <div class="admin-title">Admin</div>
+
+                    <a href="/add" class="nav-item {% if request.path == '/add' %}active{% endif %}">
+                        <span class="icon">➕</span><span class="text">Add Query</span>
+                    </a>
+
+                    <a href="/manage" class="nav-item {% if request.path == '/manage' %}active{% endif %}">
+                        <span class="icon">✏</span><span class="text">Modify</span>
+                    </a>
+
+                    <a href="/bulk_upload" class="nav-item {% if request.path == '/bulk_upload' %}active{% endif %}">
+                        <span class="icon">📤</span><span class="text">Bulk Upload</span>
+                    </a>
+
+                    <a href="/export" class="nav-item {% if request.path == '/export' %}active{% endif %}">
+                        <span class="icon">📥</span><span class="text">Export</span>
+                    </a>
+
+                    <a href="/queries_table" class="nav-item {% if request.path == '/queries_table' %}active{% endif %}">
+                        <span class="icon">📊</span><span class="text">Queries Table</span>
+                    </a>
+
+                    <a href="/admin-logout" class="nav-item logout">
+                        <span class="icon">🚪</span><span class="text">Logout</span>
+                    </a>
+                </div>
+
+                {% endif %}
+                <div class="sidebar-footer">
+                    <div class="logo-highlight">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" class="sidebar-footer-logo">
+                    </div>
+                </div>
+            </div>
 
         </div>
-
-        {% endif %}
-    </div>
 
     <div class="content">
         {% block content %}{% endblock %}
