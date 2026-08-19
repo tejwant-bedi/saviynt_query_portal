@@ -1,0 +1,1054 @@
+{
+  "title": "Saviynt EIC — Per-Table Reference",
+  "total_tables": 247,
+  "groups": {
+    "Identity & Organization": {
+      "table_count": 17,
+      "tables": {
+        "customer": {
+          "importance": "Critical",
+          "description": "Stores Saviynt's customer-style organizational or business-unit records used to represent organizational scope inside the platform. In this schema, 'customer' refers to this Saviynt organization construct rather than a consulting or commercial client record."
+        },
+        "customer_attribute": {
+          "importance": "Low",
+          "description": "Stores additional or custom attributes for a customer (org unit) as key/value-style metadata. Use this table when information about a customer (org unit) needs to be stored outside the standard columns of its main record."
+        },
+        "customer_endpoint": {
+          "importance": "Medium",
+          "description": "Maps endpoints to a customer or organizational unit in Saviynt. The relationship is used to associate specific application endpoints with the organizational scope represented by the customer record."
+        },
+        "customer_entitlementvalues": {
+          "importance": "Medium",
+          "description": "Maps entitlement values to a customer or organizational unit in Saviynt. The relationship associates specific access items with the organizational scope represented by the customer record."
+        },
+        "customer_roles": {
+          "importance": "Medium",
+          "description": "Maps roles to a customer or organizational unit in Saviynt. The relationship associates role definitions with the organizational scope represented by the customer record."
+        },
+        "customer_rule": {
+          "importance": "Low",
+          "description": "Stores the relationship between a rule (risk-engine rule) and a customer/org scope. Each record links the corresponding objects so Saviynt can retain and query that association."
+        },
+        "customer_users": {
+          "importance": "High",
+          "description": "Stores the relationship between users and a customer (org unit). Each record links the corresponding objects so Saviynt can retain and query that association."
+        },
+        "delegates": {
+          "importance": "Low",
+          "description": "Stores approval-delegation information used when a user delegates approval responsibilities, such as during an out-of-office or do-not-disturb period. It records the delegation relationship that Saviynt can use when routing approvals."
+        },
+        "organization_owners": {
+          "importance": "Medium",
+          "description": "Stores the ownership assignments for an organization. Each record identifies an owner associated with an organization, allowing Saviynt to retain who is responsible for that object. The source description also identifies these ownership records as ranked."
+        },
+        "organization_policy": {
+          "importance": "Medium",
+          "description": "Stores policy values associated with an organization. Each record represents policy information that has been assigned to the corresponding organizational record."
+        },
+        "organizations": {
+          "importance": "Medium",
+          "description": "Stores Saviynt organization records used by the newer organization model. This construct is separate from the older customer-based organizational representation and is used to represent organizational entities in the modern model."
+        },
+        "user_attributes": {
+          "importance": "Medium",
+          "description": "Stores additional or custom attributes for a user as key/value-style metadata. Use this table when information about a user needs to be stored outside the standard columns of its main record."
+        },
+        "user_groups": {
+          "importance": "Medium",
+          "description": "Stores Saviynt user-group definitions. These are groups of users used for grouping, scoping, or ownership purposes and are distinct from business or enterprise roles that bundle application access."
+        },
+        "usergroup_entitlements": {
+          "importance": "Low",
+          "description": "Maps user groups to the entitlements associated with them. The relationship represents access that is connected to membership in the corresponding user group."
+        },
+        "usergroup_owners": {
+          "importance": "Low",
+          "description": "Stores the ownership assignments for a user group. Each record identifies an owner associated with a user group, allowing Saviynt to retain who is responsible for that object."
+        },
+        "usergroup_users": {
+          "importance": "Medium",
+          "description": "Stores user-group membership by mapping users to user groups. Each row identifies a user that belongs to a particular Saviynt user group."
+        },
+        "users": {
+          "importance": "Critical",
+          "description": "Stores the master identity records that Saviynt governs, including people such as employees, contractors, and vendors. Use this table as the starting point when you need identity-level information about a person managed in Saviynt."
+        }
+      }
+    },
+    "Accounts": {
+      "table_count": 7,
+      "tables": {
+        "account_attributes": {
+          "importance": "Medium",
+          "description": "Stores additional or custom attributes for an account as key/value-style metadata. Use this table when information about an account needs to be stored outside the standard columns of its main record."
+        },
+        "accountowners": {
+          "importance": "Medium",
+          "description": "Stores business-owner assignments for an account. When more than one owner is present, the stored ranking can be used to preserve their ordering or relative ownership priority."
+        },
+        "accounts": {
+          "importance": "Critical",
+          "description": "Stores accounts that represent a login or identity on a specific target application, such as an SAP user ID or an Active Directory account. Use this table when you need account-level information for identities that Saviynt imports or manages on connected systems."
+        },
+        "att_accounts": {
+          "importance": "Medium",
+          "description": "Stores a point-in-time copy of an account at campaign-start time for Saviynt's legacy attestation process. The snapshot preserves the version of that object that was included in the attestation so it can be reviewed independently of later changes to the live record."
+        },
+        "certification_account": {
+          "importance": "High",
+          "description": "Stores a certification snapshot of an account captured when the campaign is generated or started. It preserves the account state that is presented for review in the current certification framework."
+        },
+        "certification_service_accounts": {
+          "importance": "Medium",
+          "description": "Stores a point-in-time copy of a service/privileged account for certification. This lets Saviynt retain the state of the object that was included in the access review."
+        },
+        "user_accounts": {
+          "importance": "Critical",
+          "description": "Maps Saviynt users to the accounts associated with them. Each record links a user identity to one of that user's accounts, making this the bridge between the identity record in users and the account record in accounts."
+        }
+      }
+    },
+    "Entitlements": {
+      "table_count": 22,
+      "tables": {
+        "account_entitlements1": {
+          "importance": "Critical",
+          "description": "Stores the access assigned to an account by linking the account to an entitlement. This is the core account-to-entitlement grant table and can also record how the access was obtained, such as through a role or rule, together with grant-related dates and source information."
+        },
+        "account_entitlements_privilege": {
+          "importance": "High",
+          "description": "Stores fine-grained privilege details attached to an account-to-entitlement grant. This is used when the entitlement assignment has additional sub-attributes or restrictions, such as SAP organizational-level values."
+        },
+        "account_entitlements_rollback": {
+          "importance": "Medium",
+          "description": "Stores historical or rollback information for account-to-entitlement grants. It preserves a previous grant state that Saviynt can reference when reverting or recovering provisioning-related access changes."
+        },
+        "associatedentitlements": {
+          "importance": "Low",
+          "description": "Stores correlations identified between pairs of entitlements. These relationships capture entitlement-association information used by Saviynt's role-mining or access-analysis processes."
+        },
+        "assoentexceptions": {
+          "importance": "Low",
+          "description": "Stores exceptions associated with entitlement-correlation results. It records cases where a correlation finding should be treated differently from the normal result."
+        },
+        "ent_content_events": {
+          "importance": "Low",
+          "description": "Stores change-history records for entitlement content. The records capture field-level edits, including the previous and updated values, so changes to entitlement data can be traced over time."
+        },
+        "ent_user_events": {
+          "importance": "Low",
+          "description": "Stores historical events for entitlement-to-user assignments. It records assignment changes over time, including the time-bounded context associated with when the relationship was active or changed."
+        },
+        "entitlement_map": {
+          "importance": "Low",
+          "description": "Stores dependency or request-behavior mappings between entitlements. The mapping can represent relationships such as automatically adding a dependent entitlement or excluding an entitlement during an access request."
+        },
+        "entitlement_objects": {
+          "importance": "Medium",
+          "description": "Stores authorization-object, field, and value conditions associated with an entitlement. It is used for fine-grained access definitions where an entitlement is represented by object-level constraints, such as SAP authorization data."
+        },
+        "entitlement_owners": {
+          "importance": "High",
+          "description": "Stores the business or technical owners assigned to an entitlement. These ownership assignments are used by Saviynt when determining certification or review routing for that object."
+        },
+        "entitlement_types": {
+          "importance": "Critical",
+          "description": "Defines the categories of access available for an endpoint, such as Role, Group, Tcode, Authorization Object, or another application-specific access type. Entitlement values are organized under these types so Saviynt can distinguish different kinds of access within the same endpoint."
+        },
+        "entitlement_usage": {
+          "importance": "Medium",
+          "description": "Stores recorded usage information for entitlements, including last-used dates where available. This data supports identifying access that has not been used recently and can feed unused-access analysis."
+        },
+        "entitlement_value_attrs": {
+          "importance": "Low",
+          "description": "Stores additional key/value-style attributes associated with an entitlement value. It extends the main entitlement_values record with metadata that is not represented by the standard columns of the entitlement value itself."
+        },
+        "entitlement_values": {
+          "importance": "Critical",
+          "description": "Stores the individual access values that exist on connected target systems, such as groups, roles, authorization objects, profiles, or other application-specific access items. Each entitlement value belongs to an entitlement type and represents a concrete piece of access that can be associated with accounts or governed by Saviynt."
+        },
+        "entitlementmap": {
+          "importance": "Low",
+          "description": "Stores an older or alternate form of entitlement-to-entitlement dependency mapping. It represents relationships between access items that are related for request or dependency purposes."
+        },
+        "entitlements2": {
+          "importance": "Medium",
+          "description": "Stores the first level of nested-entitlement relationships. Each record represents an entitlement contained within or related beneath another entitlement, such as one group nested inside another group."
+        },
+        "entitlements2_privilege": {
+          "importance": "Low",
+          "description": "Stores additional privilege or sub-attribute information for relationships recorded in entitlements2. It extends the level-1-to-level-2 nested-entitlement mapping with finer-grained details."
+        },
+        "entitlements3": {
+          "importance": "Low",
+          "description": "Stores the next level of nested-entitlement relationships after entitlements2. It represents level-2-to-level-3 relationships in deeper entitlement hierarchies."
+        },
+        "entitlements4": {
+          "importance": "Low",
+          "description": "Stores level-3-to-level-4 nested-entitlement relationships. It is used when an entitlement hierarchy extends beyond the levels represented by entitlements2 and entitlements3."
+        },
+        "entitlements5": {
+          "importance": "Low",
+          "description": "Stores level-4-to-level-5 nested-entitlement relationships. It represents another deeper layer of entitlement nesting in hierarchies that extend to this level."
+        },
+        "entitlementtype_privilege": {
+          "importance": "Low",
+          "description": "Stores configuration metadata for privilege sub-attributes associated with an entitlement type. It defines the additional privilege-level information that can be represented for entitlements of that type."
+        },
+        "useraccesstrace": {
+          "importance": "High",
+          "description": "Stores the historical trace of access-grant events, including the source through which access was obtained, such as direct assignment, role-driven access, or rule-driven access. It provides an audit trail linking the granted access to its origin and related provisioning-task information."
+        }
+      }
+    },
+    "Roles": {
+      "table_count": 12,
+      "tables": {
+        "childroles": {
+          "importance": "Medium",
+          "description": "Stores parent-and-child relationships between roles. It represents role nesting or composite-role structures where one role contains or depends on another role."
+        },
+        "role_attributes": {
+          "importance": "Medium",
+          "description": "Stores additional or custom attributes associated with a role. It extends the main a role record with metadata that is not represented by the standard columns of the primary table."
+        },
+        "role_ent_privilege": {
+          "importance": "Low",
+          "description": "Stores fine-grained privilege details attached to a role-to-entitlement mapping. It extends the basic role_entitlements relationship when the entitlement included in the role also requires additional privilege-level attributes."
+        },
+        "role_entitlements": {
+          "importance": "Critical",
+          "description": "Maps roles to the entitlements contained in those roles. Each record represents one entitlement included in a role and is used to understand what access the role grants."
+        },
+        "role_objects": {
+          "importance": "Medium",
+          "description": "Stores authorization-object, field, and value conditions associated with a role. It supports fine-grained role definitions that include object-level restrictions, such as SAP authorization conditions."
+        },
+        "role_owners": {
+          "importance": "High",
+          "description": "Stores the ownership assignments for a role. Each record identifies an owner associated with a role, allowing Saviynt to retain who is responsible for that object. The source description also identifies these ownership records as drives role-certification routing."
+        },
+        "role_reference": {
+          "importance": "Low",
+          "description": "Stores a relationship between an entitlement and a role together with status and time-related information. It is used where the role-entitlement association needs to be tracked as a dated or status-controlled reference."
+        },
+        "role_user_account": {
+          "importance": "Critical",
+          "description": "Stores the relationship between a role assignment and the account that receives that role. Use this table when you need to identify which accounts have a particular Saviynt role assignment."
+        },
+        "rolehierarchy": {
+          "importance": "Medium",
+          "description": "Stores role-hierarchy information that identifies the parent or root chain associated with a role. It is used to represent the broader hierarchical path of a role rather than only a single immediate parent-child relationship."
+        },
+        "roles": {
+          "importance": "Critical",
+          "description": "Stores Saviynt business or IT role definitions. A role represents a reusable bundle of access that can contain entitlements and be assigned or requested as a single governed unit."
+        },
+        "roletype_attributes": {
+          "importance": "Low",
+          "description": "Stores the custom-attribute definitions associated with a role type. These definitions determine which additional role-specific attributes are available for roles belonging to that type."
+        },
+        "user_savroles": {
+          "importance": "Medium",
+          "description": "Maps users to Saviynt SAV roles, which are internal platform roles used to control access to Saviynt features and administrative capabilities. These are different from business or enterprise roles that represent access bundles for target applications."
+        }
+      }
+    },
+    "Endpoints & Target Systems": {
+      "table_count": 10,
+      "tables": {
+        "aob_template_metadata": {
+          "importance": "Medium",
+          "description": "Stores field-level metadata used by Saviynt Application Onboarding (AOB). The metadata defines the fields and configuration information presented for the onboarding form associated with a particular application type."
+        },
+        "applicationonboarding": {
+          "importance": "Medium",
+          "description": "Stores data used by Saviynt's Application Onboarding (AOB) process. It represents the configuration captured while onboarding a new application, endpoint, or connector through the AOB workflow."
+        },
+        "applicationtype": {
+          "importance": "Medium",
+          "description": "Stores definitions for supported application or connector types used during application onboarding and configuration. Examples include application categories such as SAP or Active Directory that provide the template context for creating a connection or endpoint."
+        },
+        "endpoint_attributes": {
+          "importance": "Medium",
+          "description": "Stores endpoint-level attribute definitions used for dynamic or custom fields. These definitions control additional fields that can be presented when access is requested or provisioned for the endpoint."
+        },
+        "endpoint_certifier": {
+          "importance": "Medium",
+          "description": "Stores certifier assignments associated with an endpoint. These records identify the default reviewers that Saviynt can use when an access review is scoped to that endpoint."
+        },
+        "endpoint_metadata": {
+          "importance": "Low",
+          "description": "Stores additional endpoint configuration as key/value-style metadata. It extends the main endpoint record with configuration information that is not represented by the endpoint's standard columns."
+        },
+        "endpointmap": {
+          "importance": "Low",
+          "description": "Stores mappings used to control request behavior across endpoints. The records represent relationships between endpoints that affect how access can be exposed or requested across those endpoint boundaries."
+        },
+        "endpoints": {
+          "importance": "Critical",
+          "description": "Stores endpoint definitions that represent a specific application instance or logical application scope under a Saviynt security system. An endpoint is where Saviynt organizes accounts, entitlement types, and access for that application scope."
+        },
+        "endpoints_properties": {
+          "importance": "Low",
+          "description": "Stores extended metadata associated with endpoints beyond the main endpoint record. The stored properties include additional endpoint-state or governance information such as the PAM integration and governance-related fields represented by this schema."
+        },
+        "securitysystems": {
+          "importance": "Critical",
+          "description": "Stores the top-level Saviynt security system or application definition used to govern a connected application. The security system provides the application-level configuration context, while one or more endpoints can sit underneath it."
+        }
+      }
+    },
+    "Access Request & Provisioning (ARS)": {
+      "table_count": 21,
+      "tables": {
+        "access_approvers": {
+          "importance": "High",
+          "description": "Stores individual approval-step records for access requests. Each row represents an approval activity and can include the assigned approver, approval status, due date, comments, and workflow-related identifiers."
+        },
+        "access_class": {
+          "importance": "Low",
+          "description": "Stores reference information used to group or classify access types. It provides a lightweight classification layer for access-related objects rather than representing an actual account or entitlement assignment."
+        },
+        "access_objects": {
+          "importance": "Low",
+          "description": "Stores reference metadata for access objects. It provides descriptive or classification information used by Saviynt to identify and organize access-related objects."
+        },
+        "ars_requests": {
+          "importance": "Critical",
+          "description": "Stores the request-level record for a submitted Access Request System (ARS) request. It represents the overall request, while the individual access items requested under it are stored separately in request_access."
+        },
+        "arsrequest_attachments": {
+          "importance": "Low",
+          "description": "Stores metadata for files attached to an access request. Each record associates an uploaded attachment with the request to which the supporting file belongs."
+        },
+        "arstasks": {
+          "importance": "Critical",
+          "description": "Stores provisioning tasks created by Saviynt for access-request and lifecycle actions that must be executed against target systems. Each row represents a unit of provisioning work whose status can be tracked until the requested target-system action is completed."
+        },
+        "arstasks_exec": {
+          "importance": "Low",
+          "description": "Stores the association between a provisioning task and the execution or job run that processes it. Use it to connect an ARS task with the corresponding task-execution context."
+        },
+        "emailhistory": {
+          "importance": "Low",
+          "description": "Stores history for email notifications that Saviynt has sent in relation to request or approval processing. The records provide notification-level trace information for those workflow communications."
+        },
+        "emailhistoryprocess": {
+          "importance": "Low",
+          "description": "Stores notification records that are still being processed or prepared for sending. It acts as the in-process counterpart to emailhistory for request- and approval-related email activity."
+        },
+        "ff_usage": {
+          "importance": "Low",
+          "description": "Stores usage or certification-related records associated with Fire Fighter ID activity. It provides a history of Fire Fighter access usage that can be referenced during governance or review processes."
+        },
+        "ffid_sessions": {
+          "importance": "Medium",
+          "description": "Stores individual Fire Fighter ID session records. The session information tracks the lifecycle of emergency-access usage, including the recorded start/end context and who requested the access or whom it was requested for."
+        },
+        "ffid_users": {
+          "importance": "Medium",
+          "description": "Stores the assignment of a Fire Fighter ID to a user. The relationship represents emergency or break-glass access that has been associated with the corresponding user."
+        },
+        "incomingmail": {
+          "importance": "Low",
+          "description": "Stores records used when approval activity is received and processed through inbound email. It provides a log of email-based approval input handled by Saviynt."
+        },
+        "jbpmretry": {
+          "importance": "Low",
+          "description": "Stores retry records for approval or workflow processing handled by the jBPM workflow engine. It is used to retain workflow steps that need another processing attempt after they could not complete normally."
+        },
+        "request_access": {
+          "importance": "Critical",
+          "description": "Stores the individual access items contained in an access request. Each record represents a specific account, role, entitlement, or other access item being requested under the parent ARS request."
+        },
+        "request_access_attrs": {
+          "importance": "Medium",
+          "description": "Stores attribute or form-field values submitted for an individual request_access line item. It preserves the additional information entered for that requested access item."
+        },
+        "request_exceptions": {
+          "importance": "Medium",
+          "description": "Stores exception records created when a Separation of Duties issue is associated with an access request. The records retain the request-side exception and its related approval or decision trail."
+        },
+        "request_exceptions_access": {
+          "importance": "Low",
+          "description": "Maps request exceptions to the specific access items involved in them. Each record identifies which requested access item is associated with a particular exception."
+        },
+        "request_template": {
+          "importance": "Low",
+          "description": "Stores reusable access-request template definitions. A template lets Saviynt retain a predefined request structure that can be reused instead of selecting the same access items manually each time."
+        },
+        "request_template_access": {
+          "importance": "Low",
+          "description": "Maps request templates to the access items contained in them. Each record represents one access item that is part of a saved request template."
+        },
+        "wsfallback": {
+          "importance": "Low",
+          "description": "Stores failed web-service provisioning calls that require retry or fallback handling. It provides a queue of provisioning operations that did not complete successfully on their original attempt."
+        }
+      }
+    },
+    "Certification / Access Review": {
+      "table_count": 52,
+      "tables": {
+        "att_acc_entitlements1_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a legacy attestation account-entitlement item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "att_access_objects": {
+          "importance": "Low",
+          "description": "Stores a point-in-time copy of an access object for Saviynt's legacy attestation process. The snapshot preserves the version of that object that was included in the attestation so it can be reviewed independently of later changes to the live record."
+        },
+        "att_account_entitlements_privilege": {
+          "importance": "Low",
+          "description": "Stores a point-in-time copy of a grant's privilege sub-attributes for Saviynt's legacy attestation process. The snapshot preserves the version of that object that was included in the attestation so it can be reviewed independently of later changes to the live record."
+        },
+        "att_account_entitlements_privilege_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a legacy attestation privilege sub-attribute item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "att_certifiers": {
+          "importance": "Low",
+          "description": "Stores the reviewer or certifier assigned to a legacy attestation line item. This association records who is responsible for reviewing that item in the relevant attestation or certification."
+        },
+        "att_child_roles_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a legacy attestation role-nesting item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "att_childroles": {
+          "importance": "Low",
+          "description": "Stores a point-in-time copy of role nesting for Saviynt's legacy attestation process. The snapshot preserves the version of that object that was included in the attestation so it can be reviewed independently of later changes to the live record."
+        },
+        "att_ent2_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a legacy attestation nested-entitlement item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "att_ent_accounts_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a legacy attestation account-entitlement pairing. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "att_ent_object_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a legacy attestation entitlement-object item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "att_ent_values_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a legacy attestation entitlement-value item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "att_entitlement_values": {
+          "importance": "Medium",
+          "description": "Stores a point-in-time copy of an entitlement for Saviynt's legacy attestation process. The snapshot preserves the version of that object that was included in the attestation so it can be reviewed independently of later changes to the live record."
+        },
+        "att_role_entitlements": {
+          "importance": "Low",
+          "description": "Stores a point-in-time copy of role-entitlement mapping for Saviynt's legacy attestation process. The snapshot preserves the version of that object that was included in the attestation so it can be reviewed independently of later changes to the live record."
+        },
+        "att_role_entitlements_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a legacy attestation role-entitlement item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "att_role_objects": {
+          "importance": "Low",
+          "description": "Stores a point-in-time copy of role authorization-object constraints for Saviynt's legacy attestation process. The snapshot preserves the version of that object that was included in the attestation so it can be reviewed independently of later changes to the live record."
+        },
+        "att_role_user_account": {
+          "importance": "Medium",
+          "description": "Stores a point-in-time copy of a role assignment for Saviynt's legacy attestation process. The snapshot preserves the version of that object that was included in the attestation so it can be reviewed independently of later changes to the live record."
+        },
+        "att_role_user_account_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a legacy attestation role-assignment item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "att_roles": {
+          "importance": "Medium",
+          "description": "Stores a point-in-time copy of a role for Saviynt's legacy attestation process. The snapshot preserves the version of that object that was included in the attestation so it can be reviewed independently of later changes to the live record."
+        },
+        "att_roles_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a legacy attestation role item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "att_user_accounts_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a legacy attestation user-account item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "att_user_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a legacy attestation user item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "att_users": {
+          "importance": "Medium",
+          "description": "Stores a point-in-time copy of a user for Saviynt's legacy attestation process. The snapshot preserves the version of that object that was included in the attestation so it can be reviewed independently of later changes to the live record."
+        },
+        "attestations": {
+          "importance": "Medium",
+          "description": "Stores campaign-level definitions used by Saviynt's legacy attestation engine. It represents the older access-review campaign model that predates the newer campaign and certification tables."
+        },
+        "campaign": {
+          "importance": "Critical",
+          "description": "Stores the definition of a certification campaign, including the campaign-level configuration that controls the review scope, timing, and reviewer setup. Campaigns are used to generate the certification instances and review items that reviewers act on."
+        },
+        "campaign_template": {
+          "importance": "Low",
+          "description": "Stores reusable certification-campaign template definitions. A template preserves campaign configuration that can be applied again when creating future access-review campaigns."
+        },
+        "cert_child_roles_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a cert_* role-nesting item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "cert_childroles": {
+          "importance": "Low",
+          "description": "Stores a point-in-time copy of role nesting for use in certification. The record represents the version of that relationship or object that was included in the access review."
+        },
+        "cert_ent_values_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a cert_* entitlement-value item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "cert_role_entitlements": {
+          "importance": "Low",
+          "description": "Stores a point-in-time copy of role-entitlement mapping for use in certification. The record represents the version of that relationship or object that was included in the access review."
+        },
+        "cert_role_entitlements_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a cert_* role-entitlement item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "cert_role_user_account": {
+          "importance": "Medium",
+          "description": "Stores a point-in-time copy of a role assignment for use in certification. The record represents the version of that relationship or object that was included in the access review."
+        },
+        "cert_roles_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a cert_* role item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "cert_service_account_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a cert_* service-account item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "certification": {
+          "importance": "Critical",
+          "description": "Stores an individual certification instance created as part of a certification campaign. It represents the concrete access-review instance through which the scoped users, accounts, roles, or entitlements are reviewed."
+        },
+        "certification_account_entitilements_privilege": {
+          "importance": "Low",
+          "description": "Stores a point-in-time copy of privilege sub-attributes on an account-entitlement grant, for use in certification. The record represents the version of that relationship or object that was included in the access review."
+        },
+        "certification_account_entitlement1_status": {
+          "importance": "High",
+          "description": "Stores the reviewer decision or review status recorded for an account-entitlement certification item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "certification_account_entitlements_privilege_status": {
+          "importance": "Medium",
+          "description": "Stores the reviewer decision or review status recorded for a privilege sub-attribute certification item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "certification_certifier": {
+          "importance": "Medium",
+          "description": "Stores the reviewer or certifier assigned to a given certification line item. This association records who is responsible for reviewing that item in the relevant attestation or certification."
+        },
+        "certification_child_customer_status": {
+          "importance": "Low",
+          "description": "Stores the reviewer decision or review status recorded for a child-customer relationship certification item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "certification_customer": {
+          "importance": "Medium",
+          "description": "Stores a point-in-time copy of a customer (org unit) included in a certification. It preserves the data presented to the reviewer for that certification rather than relying only on the current live object."
+        },
+        "certification_customer_status": {
+          "importance": "Medium",
+          "description": "Stores the reviewer decision or review status recorded for a customer (org unit) certification item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "certification_customer_user_status": {
+          "importance": "Medium",
+          "description": "Stores the reviewer decision or review status recorded for a user-within-customer certification item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "certification_entitlement2_status": {
+          "importance": "Medium",
+          "description": "Stores the reviewer decision or review status recorded for a nested-entitlement certification item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "certification_entitlement_value": {
+          "importance": "High",
+          "description": "Stores a point-in-time copy of an entitlement included in a certification. It preserves the data presented to the reviewer for that certification rather than relying only on the current live object."
+        },
+        "certification_role": {
+          "importance": "High",
+          "description": "Stores a point-in-time copy of a role included in a certification. It preserves the data presented to the reviewer for that certification rather than relying only on the current live object."
+        },
+        "certification_role_user_account_status": {
+          "importance": "High",
+          "description": "Stores the reviewer decision or review status recorded for a role-assignment certification item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "certification_service_account_entitlement_status": {
+          "importance": "Medium",
+          "description": "Stores the reviewer decision or review status recorded for a service-account entitlement certification item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "certification_service_account_status": {
+          "importance": "Medium",
+          "description": "Stores the reviewer decision or review status recorded for a service-account certification item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "certification_service_entitlement_values": {
+          "importance": "Medium",
+          "description": "Stores a point-in-time copy of an entitlement held by a service account, included in a certification. It preserves the data presented to the reviewer for that certification rather than relying only on the current live object."
+        },
+        "certification_user": {
+          "importance": "High",
+          "description": "Stores a point-in-time copy of a user included in a certification. It preserves the data presented to the reviewer for that certification rather than relying only on the current live object."
+        },
+        "certification_user_account_status": {
+          "importance": "High",
+          "description": "Stores the reviewer decision or review status recorded for a user-account certification item. This table preserves the outcome associated with that specific item in the relevant attestation or certification process."
+        },
+        "certification_user_status": {
+          "importance": "High",
+          "description": "Stores the reviewer decision for a user-level certification item, including the approve-or-revoke outcome represented by the certification process. It is the status record for that reviewed item."
+        }
+      }
+    },
+    "SoD, Risk & Controls": {
+      "table_count": 35,
+      "tables": {
+        "accessrulesexception": {
+          "importance": "Medium",
+          "description": "Stores a flattened reporting view of access-rule exception information together with user, entitlement, and job-related attributes. Its wide structure is intended to make exception data available in a single record set for reporting or analysis."
+        },
+        "analyticconflictaccept": {
+          "importance": "Medium",
+          "description": "Stores analytics findings that have been accepted as exceptions or risk-accepted results. The records preserve that a detected analytics conflict was reviewed and accepted rather than treated as an unresolved finding."
+        },
+        "analyticsconfig": {
+          "importance": "High",
+          "description": "Stores configuration for the legacy Saviynt analytics or SoD rule model. The rule record can contain the analytics query together with classification information such as risk level and category."
+        },
+        "analyticsconfig_attributes": {
+          "importance": "Medium",
+          "description": "Stores parameter or attribute definitions associated with a legacy analytics rule. These records provide the configurable inputs or metadata used by the corresponding analyticsconfig entry."
+        },
+        "analyticsconfiges": {
+          "importance": "High",
+          "description": "Stores configuration for the newer Saviynt analytics or SoD rule model. Each record represents an analytics definition that Saviynt can execute to identify configured access, risk, or control conditions."
+        },
+        "analyticsconfiges_attributes": {
+          "importance": "Medium",
+          "description": "Stores parameter or attribute definitions associated with the newer analytics rule model. These records provide configurable inputs or metadata for the corresponding analyticsconfiges entry."
+        },
+        "auditrules": {
+          "importance": "Low",
+          "description": "Stores named audit-rule definitions that evaluate configured conditions within the scope of a Saviynt security system. Each record represents the rule configuration used for that audit condition."
+        },
+        "bp_attributes": {
+          "importance": "Low",
+          "description": "Stores additional or custom attributes associated with a business process. It extends the main a business process record with metadata that is not represented by the standard columns of the primary table."
+        },
+        "bp_functions": {
+          "importance": "Medium",
+          "description": "Maps business functions to the business processes they belong to. Each record represents a relationship showing that a specific function is included under a particular business process."
+        },
+        "bp_owners": {
+          "importance": "Low",
+          "description": "Stores the ownership assignments for a business process. Each record identifies an owner associated with a business process, allowing Saviynt to retain who is responsible for that object."
+        },
+        "bp_roles": {
+          "importance": "Low",
+          "description": "Maps roles to a business process. Each record represents one stored relationship between the two object types."
+        },
+        "busprocs": {
+          "importance": "Medium",
+          "description": "Stores business-process definitions used to group related functions, roles, or risks. A process can represent a broader business area, such as Procure-to-Pay, under which lower-level access-risk objects are organized."
+        },
+        "childfunctions": {
+          "importance": "Low",
+          "description": "Stores parent-and-child or grouping relationships between business functions. It allows Saviynt to represent a function hierarchy instead of treating every function as completely independent."
+        },
+        "correlationrules": {
+          "importance": "Medium",
+          "description": "Stores correlation rules used in Saviynt role-mining analysis. The rules represent relationships identified from access-usage or identity-attribute patterns that can be considered when analyzing potential role structures."
+        },
+        "function_entitlements": {
+          "importance": "High",
+          "description": "Maps business functions to the entitlements that satisfy or represent those functions. Each record identifies an entitlement that contributes to the access definition of a particular function."
+        },
+        "function_objects": {
+          "importance": "High",
+          "description": "Maps business functions to the authorization objects, fields, and values that satisfy those functions. This supports object-level function definitions, particularly for SAP-style authorization models."
+        },
+        "function_objects_group": {
+          "importance": "Medium",
+          "description": "Stores grouped authorization-object conditions associated with a function. It organizes multiple object-level conditions into the grouped structure used by the function definition."
+        },
+        "functions": {
+          "importance": "Critical",
+          "description": "Stores business-function definitions used in Saviynt's risk and SoD model. A function represents a business action or capability that is defined through the entitlements, authorization objects, or related conditions associated with it."
+        },
+        "hanareftable": {
+          "importance": "Low",
+          "description": "Stores reference or lookup values used by Saviynt's SAP HANA rule processing. The table provides supporting values that HANA-focused rules can reference while evaluating configured conditions."
+        },
+        "hanarule": {
+          "importance": "High",
+          "description": "Stores the header or primary definition for SAP HANA-focused authorization or SoD rules. Related HANA rule conditions, actions, and exceptions are stored in the associated HANA rule tables."
+        },
+        "hanaruleaction": {
+          "importance": "Medium",
+          "description": "Stores actions associated with an SAP HANA rule. Each record represents an action configured to be associated with the corresponding hanarule definition."
+        },
+        "hanaruleattribute": {
+          "importance": "Medium",
+          "description": "Stores condition attributes associated with an SAP HANA rule. These records define the attribute-level conditions that are evaluated as part of the corresponding rule."
+        },
+        "hanarulesexception": {
+          "importance": "Medium",
+          "description": "Stores exceptions associated with SAP HANA rules for users or entitlements. Each record represents a case that has been granted exception treatment relative to the corresponding HANA rule."
+        },
+        "jmrules": {
+          "importance": "Medium",
+          "description": "Stores Job Role Matrix (JRM) rule definitions used in role-mining or recommendation processing. The rules relate job or identity attributes to access patterns considered by Saviynt's role-analysis processes."
+        },
+        "mc_risk_account": {
+          "importance": "High",
+          "description": "Maps accounts and risks to the mitigating controls applied to them. Each record identifies that an account has a particular mitigation associated with a particular risk."
+        },
+        "mitigatingcontrols": {
+          "importance": "High",
+          "description": "Stores mitigating or compensating-control definitions used in Saviynt's risk model. These controls can be associated with risks to document the mitigation applied to a detected or defined access risk."
+        },
+        "riskowners": {
+          "importance": "Medium",
+          "description": "Stores ownership assignments for risks. Each record identifies the business owner responsible for the corresponding risk definition."
+        },
+        "risks": {
+          "importance": "Critical",
+          "description": "Stores defined Separation of Duties (SoD) risks. Each risk represents a conflict created from combinations of business functions that Saviynt should detect when they are held together by the same identity or account."
+        },
+        "rule": {
+          "importance": "Medium",
+          "description": "Stores Saviynt rule definitions that evaluate configured conditions and perform associated actions. The table covers generic rule-driven behavior such as event-based, birthright, or detective processing represented by the configured rule record."
+        },
+        "rule_owners": {
+          "importance": "Low",
+          "description": "Stores the ownership assignments for a rule. Each record identifies an owner associated with a rule, allowing Saviynt to retain who is responsible for that object."
+        },
+        "ruleset_risks": {
+          "importance": "High",
+          "description": "Maps risk definitions to Saviynt rulesets. Each record identifies that a particular risk is included in a particular Separation of Duties ruleset."
+        },
+        "rulesets": {
+          "importance": "High",
+          "description": "Stores named Separation of Duties ruleset definitions. A ruleset groups multiple risk definitions so they can be managed and evaluated as a related collection."
+        },
+        "sodrisk_entitlement": {
+          "importance": "High",
+          "description": "Stores the entitlement evidence associated with a detected SoD violation. Each record identifies the specific entitlement that contributed to the corresponding sodrisks finding."
+        },
+        "sodrisk_objects": {
+          "importance": "High",
+          "description": "Stores the authorization-object evidence associated with a detected SoD violation. Each record identifies the specific object-level access that contributed to the corresponding sodrisks finding."
+        },
+        "sodrisks": {
+          "importance": "Critical",
+          "description": "Stores detected Separation of Duties (SoD) violations produced from the configured risk model. Each record represents an account identified as holding the conflicting access required to trigger a defined SoD risk."
+        }
+      }
+    },
+    "SAP-Specific": {
+      "table_count": 6,
+      "tables": {
+        "cdhdr": {
+          "importance": "Medium",
+          "description": "Stores SAP change-document header data imported into Saviynt, corresponding to SAP's native CDHDR change-document header structure. It provides the header-level context for SAP change records used by Saviynt's SAP-related audit and governance processing."
+        },
+        "cdpos": {
+          "importance": "Medium",
+          "description": "Stores SAP change-document item data imported into Saviynt, corresponding to SAP's native CDPOS change-document item structure. It contains the item-level change details associated with SAP change-document headers."
+        },
+        "cdposnew": {
+          "importance": "Medium",
+          "description": "Stores a newer or restructured form of SAP change-document item data used by Saviynt. It represents SAP change details similar in purpose to CDPOS while using the alternate structure present in this Saviynt schema."
+        },
+        "document_usage_logs": {
+          "importance": "Medium",
+          "description": "Internal Saviynt table whose exact business purpose is not explicitly defined in the Saviynt documentation reviewed for this catalog. To avoid guessing, no functional meaning is assigned here beyond identifying it as part of the Saviynt database schema."
+        },
+        "logdata": {
+          "importance": "Medium",
+          "description": "Internal Saviynt table whose exact business purpose is not explicitly defined in the Saviynt documentation reviewed for this catalog. To avoid guessing, no functional meaning is assigned here beyond identifying it as part of the Saviynt database schema."
+        },
+        "logheader": {
+          "importance": "Medium",
+          "description": "Internal Saviynt table whose exact business purpose is not explicitly defined in the Saviynt documentation reviewed for this catalog. To avoid guessing, no functional meaning is assigned here beyond identifying it as part of the Saviynt database schema."
+        }
+      }
+    },
+    "Role Mining & AI Recommendations": {
+      "table_count": 18,
+      "tables": {
+        "aetrustconsolidated": {
+          "importance": "Low",
+          "description": "Internal Saviynt table whose exact business purpose is not explicitly defined in the Saviynt documentation reviewed for this catalog. To avoid guessing, no functional meaning is assigned here beyond identifying it as part of the Saviynt database schema."
+        },
+        "cac_access": {
+          "importance": "Low",
+          "description": "Internal Saviynt table whose exact business purpose is not explicitly defined in the Saviynt documentation reviewed for this catalog. To avoid guessing, no functional meaning is assigned here beyond identifying it as part of the Saviynt database schema."
+        },
+        "cac_role": {
+          "importance": "Low",
+          "description": "Internal Saviynt table whose exact business purpose is not explicitly defined in the Saviynt documentation reviewed for this catalog. To avoid guessing, no functional meaning is assigned here beyond identifying it as part of the Saviynt database schema."
+        },
+        "paa_uk_evk": {
+          "importance": "Low",
+          "description": "Internal Saviynt table whose exact business purpose is not explicitly defined in the Saviynt documentation reviewed for this catalog. To avoid guessing, no functional meaning is assigned here beyond identifying it as part of the Saviynt database schema."
+        },
+        "paa_uk_rk": {
+          "importance": "Low",
+          "description": "Internal Saviynt table whose exact business purpose is not explicitly defined in the Saviynt documentation reviewed for this catalog. To avoid guessing, no functional meaning is assigned here beyond identifying it as part of the Saviynt database schema."
+        },
+        "paavalues": {
+          "importance": "Low",
+          "description": "Internal Saviynt table whose exact business purpose is not explicitly defined in the Saviynt documentation reviewed for this catalog. To avoid guessing, no functional meaning is assigned here beyond identifying it as part of the Saviynt database schema."
+        },
+        "proposed_accountowners": {
+          "importance": "Low",
+          "description": "Stores owner candidates that Saviynt has proposed for accounts but that have not yet been treated as confirmed ownership. The records represent system-generated ownership suggestions for account objects."
+        },
+        "proposedowners": {
+          "importance": "Low",
+          "description": "Stores owner candidates that Saviynt has proposed for entitlements but that have not yet been treated as confirmed ownership. The records represent system-generated ownership suggestions for entitlement values."
+        },
+        "recommendedobjects": {
+          "importance": "Low",
+          "description": "Stores access objects recommended by Saviynt's recommendation capabilities for access-request scenarios. The records represent system-generated recommendations rather than existing access assignments."
+        },
+        "roleaccessmismatchae1": {
+          "importance": "Low",
+          "description": "Stores the account-to-entitlement side of data associated with a role-access mismatch finding. It provides supporting grant information used alongside the main roleaccessmismatches record."
+        },
+        "roleaccessmismatches": {
+          "importance": "Medium",
+          "description": "Stores role-access mismatch findings where the access present on an account does not align with the access represented by its role assignment. Each record represents a detected difference between expected role-based access and actual account access."
+        },
+        "roleaccessmismatchrua": {
+          "importance": "Low",
+          "description": "Stores the role-user-account side of data associated with a role-access mismatch finding. It provides supporting role-assignment information used alongside the main roleaccessmismatches record."
+        },
+        "rolecomparisions": {
+          "importance": "Low",
+          "description": "Stores saved comparison results between roles. The records preserve role-to-role comparison analysis so differences or similarities between role definitions can be reviewed later."
+        },
+        "ruatrustconsolidated": {
+          "importance": "Low",
+          "description": "Internal Saviynt table whose exact business purpose is not explicitly defined in the Saviynt documentation reviewed for this catalog. To avoid guessing, no functional meaning is assigned here beyond identifying it as part of the Saviynt database schema."
+        },
+        "simulationdata": {
+          "importance": "Medium",
+          "description": "Stores before-and-after data associated with a simulation. The records preserve the state used to compare the modeled change with the state that existed before the simulation."
+        },
+        "simulationdetail": {
+          "importance": "Medium",
+          "description": "Stores the primary or header record for a Saviynt what-if simulation. It represents the simulation run under which the related detail data and summary results are organized."
+        },
+        "simulationsummary": {
+          "importance": "Low",
+          "description": "Stores summarized results for a simulation run. The summary includes aggregate information such as role counts or SoD-conflict counts produced by the modeled scenario."
+        },
+        "sodrecommendation": {
+          "importance": "Low",
+          "description": "Stores remediation recommendations produced by Saviynt's SoD analysis. The records represent suggested actions or access changes associated with resolving or reducing detected Separation of Duties issues."
+        }
+      }
+    },
+    "Analytics, Dashboards & Control Center": {
+      "table_count": 11,
+      "tables": {
+        "control_center_analytics_run_details": {
+          "importance": "Low",
+          "description": "Stores execution-history and trend information for the analytics rule behind a Control Center KPI. It allows KPI results to be associated with the analytics runs from which those measurements were produced."
+        },
+        "control_center_book": {
+          "importance": "Low",
+          "description": "Stores Control Center book definitions. A book is a named collection used to organize KPIs and menu items into the dashboard experience presented for a particular use case or persona."
+        },
+        "control_center_book_kpi_map": {
+          "importance": "Low",
+          "description": "Maps Control Center KPIs to Control Center books. Each record identifies that a particular KPI is included in a particular book."
+        },
+        "control_center_book_menu_map": {
+          "importance": "Low",
+          "description": "Maps Control Center menu items to Control Center books. Each record identifies that a particular menu item is included in a particular book."
+        },
+        "control_center_kpi": {
+          "importance": "Medium",
+          "description": "Stores Control Center KPI definitions. Each KPI represents a metric or indicator whose value is derived from the results of the associated Saviynt analytics rule."
+        },
+        "control_center_kpi_criticality": {
+          "importance": "Low",
+          "description": "Stores criticality or weighting definitions that can be associated with Control Center KPIs. These values provide the classification levels used to express the relative importance or severity of a KPI."
+        },
+        "control_center_menu": {
+          "importance": "Low",
+          "description": "Stores menu-item definitions used by Saviynt Control Center. Each record represents a navigable entry that can be organized into the Control Center dashboard structure."
+        },
+        "control_center_topic": {
+          "importance": "Low",
+          "description": "Stores topic definitions used to organize Control Center books. A topic provides a higher-level grouping under which related books can be arranged."
+        },
+        "dashboard_analytics_config": {
+          "importance": "Low",
+          "description": "Maps analytics configuration or results to dashboard content. The relationship allows a dashboard section to display information produced by the corresponding Saviynt analytics rule."
+        },
+        "dashboard_savroles": {
+          "importance": "Low",
+          "description": "Maps dashboard sections to Saviynt SAV roles. The records identify which internal Saviynt platform roles are allowed to view the corresponding dashboard content."
+        },
+        "dashboards": {
+          "importance": "Medium",
+          "description": "Stores dashboard definitions and their display configuration. A dashboard record can contain information such as chart configuration, the data query, and the data points used to render dashboard content."
+        }
+      }
+    },
+    "System, Config & Infra": {
+      "table_count": 36,
+      "tables": {
+        "childquestion": {
+          "importance": "Low",
+          "description": "Stores child or follow-up questions that are conditionally displayed within a questionnaire. The relationship allows a questionnaire to present additional questions based on the parent-question flow."
+        },
+        "configuration": {
+          "importance": "Low",
+          "description": "Stores general Saviynt platform configuration as key/value-style settings. It acts as a system-level configuration store for settings that are not represented in more specialized configuration tables."
+        },
+        "customerrulerundata": {
+          "importance": "Low",
+          "description": "Stores execution-history data for rules that run against organization or customer records. It provides an audit trail of the rule execution and the organization-related data processed by that run."
+        },
+        "dataset": {
+          "importance": "Low",
+          "description": "Stores definitions for administrator-managed lookup datasets. A dataset represents a reusable list whose values can be referenced by Saviynt forms, rules, or other configuration."
+        },
+        "dataset_values": {
+          "importance": "Low",
+          "description": "Stores the individual values that belong to a dataset. Each record represents one entry in the lookup list defined by the corresponding dataset record."
+        },
+        "default_policy": {
+          "importance": "Low",
+          "description": "Stores Saviynt default-policy definitions supplied as baseline configuration. These records represent the standard policy values from which related platform configuration can be initialized or referenced."
+        },
+        "ecmemailtemplate": {
+          "importance": "Low",
+          "description": "Stores email-notification template definitions used by Saviynt. The templates contain the reusable content and configuration that notification processes use when generating email messages."
+        },
+        "ecmimportjob": {
+          "importance": "Low",
+          "description": "Stores execution records for Saviynt import jobs. The log retains job-run information such as the trigger name or type and the response or result associated with the import execution."
+        },
+        "ecmsmstemplate": {
+          "importance": "Low",
+          "description": "Stores configuration related to SMS notifications, including reusable SMS templates and gateway-related settings represented by this schema. It supports Saviynt processes that deliver notification content through SMS."
+        },
+        "execution_trail": {
+          "importance": "Low",
+          "description": "Stores low-level execution-trail records generated by Saviynt rule processing. The table provides audit information about rule-engine actions that were evaluated or executed."
+        },
+        "externalcustomers": {
+          "importance": "Low",
+          "description": "Stores external customer records used for platform billing or subscription context. These records are separate from the identity-governance customer or organization data used to model users and access."
+        },
+        "feature": {
+          "importance": "Low",
+          "description": "Stores definitions for registered Saviynt platform features or API-related capabilities. The table acts as reference data describing features known to the platform."
+        },
+        "fields": {
+          "importance": "Low",
+          "description": "Stores the master reference list of authorization-object fields used by role, entitlement, or function object definitions. It provides the field-level reference data required by object-based access models."
+        },
+        "importlog": {
+          "importance": "Low",
+          "description": "Stores log records for data-import executions. The table provides historical information about import jobs that have run in Saviynt."
+        },
+        "instance": {
+          "importance": "Low",
+          "description": "Stores metadata describing the Saviynt cloud instance or environment. The records provide environment-level reference information used by the platform."
+        },
+        "message_properties": {
+          "importance": "Low",
+          "description": "Stores localized message text used by the Saviynt user interface. The table provides message-property values that allow UI text to be presented for supported localization contexts."
+        },
+        "nodemac": {
+          "importance": "Low",
+          "description": "Stores node-level health or heartbeat information for Saviynt's clustered runtime. The records are used to track the presence or status of application nodes represented in this table."
+        },
+        "notifications": {
+          "importance": "Low",
+          "description": "Stores in-application notification records associated with role-change activity. The records preserve the notifications generated for those role-related events."
+        },
+        "policyrule": {
+          "importance": "Low",
+          "description": "Stores password-policy rule definitions used by Saviynt. The configured rules cover password-management requirements represented in the schema, including complexity, expiration, and lockout-related settings."
+        },
+        "questionnaire": {
+          "importance": "Low",
+          "description": "Stores custom questionnaire definitions used by Saviynt workflows. A questionnaire groups the questions and related configuration that can be presented as part of the associated workflow."
+        },
+        "reactdynamicvalues": {
+          "importance": "Low",
+          "description": "Stores dynamic form-field definitions used by Saviynt's React-based user interface. The values are represented through JSON-schema-style configuration that controls how those dynamic UI fields are defined."
+        },
+        "regulation": {
+          "importance": "Low",
+          "description": "Stores reference definitions for named regulations or compliance requirements, such as SOX or GDPR. These records can be associated with risk information so the relevant regulatory context is retained with the governance model."
+        },
+        "report_attributes": {
+          "importance": "Low",
+          "description": "Stores parameter or filter definitions associated with saved reports. The records describe the configurable report inputs used when a report is generated or executed."
+        },
+        "reportdetail": {
+          "importance": "Low",
+          "description": "Stores metadata that associates a generated report file with its report definition or report name. It provides the link between the generated output and the report it belongs to."
+        },
+        "reports": {
+          "importance": "Low",
+          "description": "Stores metadata for report files generated by Saviynt. The table tracks the report-output records rather than the underlying business data displayed inside the report."
+        },
+        "sav_sync_file_version": {
+          "importance": "Low",
+          "description": "Stores version information for files used by Saviynt Connect synchronization. The records allow the platform to track which version of a synchronization file is represented."
+        },
+        "saviyntconnectdts": {
+          "importance": "Low",
+          "description": "Stores staged data received through the Saviynt Connect DTS integration process. It acts as an intermediate landing area before or during the related synchronization processing."
+        },
+        "scanrules": {
+          "importance": "Low",
+          "description": "Stores scanning-rule definitions used to identify configured sensitive-data or pattern matches. Each record represents the rule criteria that Saviynt uses for that scanning process."
+        },
+        "scanrules_entitlements": {
+          "importance": "Low",
+          "description": "Stores the entitlement values matched by scanning rules. Each record represents a relationship between a scan-rule result and the entitlement value that satisfied the configured pattern or condition."
+        },
+        "session_launch_detail": {
+          "importance": "Low",
+          "description": "Stores lifecycle information for privileged-access sessions. The records track session launch and end information so a privileged session can be traced from start through completion."
+        },
+        "sysparams": {
+          "importance": "Low",
+          "description": "Stores system-parameter definitions associated with endpoints. The table represents parameter values and classifications such as default, recommended, system-defined, or user-defined values for the relevant endpoint context."
+        },
+        "terminatesession": {
+          "importance": "Low",
+          "description": "Stores records of sessions that were manually terminated. The table provides an audit trail of explicit session-termination actions."
+        },
+        "uploads": {
+          "importance": "Low",
+          "description": "Stores metadata for files generated or uploaded through Saviynt, including import and export files represented by this schema. It tracks file-level information rather than the business records contained inside the files."
+        },
+        "userlogins": {
+          "importance": "Low",
+          "description": "Stores Saviynt user-interface login and logout history. The records provide session-level audit information showing when platform users entered or left Saviynt."
+        },
+        "userrulerundata": {
+          "importance": "Low",
+          "description": "Stores execution-history data for rules that run against user records. The audit trail can preserve the user data before and after processing together with the actions triggered by the rule run."
+        },
+        "vendorattribute": {
+          "importance": "Low",
+          "description": "Stores additional attributes associated with vendor or customer records. It extends the main vendor/customer data with metadata that is not represented by the standard columns of the primary record."
+        }
+      }
+    }
+  }
+}

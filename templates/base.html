@@ -38,7 +38,14 @@
                     <span class="icon">🧩</span>
                     <span class="text">Modules</span>
                 </a>
-
+                <a
+                    href="{{ url_for('schema_explorer') }}"
+                    class="nav-item {% if request.path.startswith('/schema') %}active{% endif %}"
+                    title="Database Schema"
+                >
+                    <span class="icon">🗄️</span>
+                    <span class="text">Schema</span>
+                </a>
                 {% if session.get("admin") %}
 
                 <div class="admin-section">

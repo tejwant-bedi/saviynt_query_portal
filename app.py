@@ -1,4 +1,6 @@
 import os
+import json
+from pathlib import Path
 from flask import Flask, flash, render_template, request, redirect, url_for, session, Response
 from sqlalchemy import or_,asc
 from extensions import db
@@ -101,6 +103,215 @@ db.init_app(app)
 
 from models import Query
 
+# ===============================
+# SAVIYNT DATABASE SCHEMA
+# ===============================
+
+BASE_DIR = Path(__file__).resolve().parent
+SCHEMA_DIR = BASE_DIR / "schema"
+
+SCHEMA_FILE = SCHEMA_DIR / "saviynt_database_schema.json"
+CATALOG_FILE = SCHEMA_DIR / "saviynt_schema_catalog.json"
+RELATIONSHIPS_FILE = SCHEMA_DIR / "saviynt_schema_relationships.json"
+
+def load_schema_data():
+    """Load the technical database schema."""
+    with open(SCHEMA_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def load_schema_catalog():
+    """Load table grouping, descriptions and importance metadata."""
+    with open(CATALOG_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def load_schema_relationships():
+    with open(RELATIONSHIPS_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+# Load once when application starts.
+schema_data = load_schema_data()
+schema_catalog = load_schema_catalog()
+schema_relationships_data = load_schema_relationships()
+schema_relationships = schema_relationships_data.get("relationships", [])
+
+schema_tables = schema_data.get("tables", {})
+schema_groups = schema_catalog.get("groups", {})
+
+@app.route("/schema")
+def schema_explorer():
+
+    search_term = request.args.get("search", "").strip()
+    search_lower = search_term.lower()
+
+    groups = []
+
+    # Every matching column across every table
+    column_matches = []
+
+
+    for group_name, group_data in schema_groups.items():
+
+        filtered_tables = {}
+
+        for table_name, table_metadata in group_data.get("tables", {}).items():
+
+            table_description = table_metadata.get("description", "")
+
+            # Get every column for this table
+            table_columns = schema_tables.get(table_name, {})
+
+
+            # -------------------------------------------------
+            # FIND EVERY MATCHING COLUMN
+            # -------------------------------------------------
+
+            matching_columns = []
+
+            if search_term:
+
+                for column_name, column_metadata in table_columns.items():
+
+                    if search_lower in column_name.lower():
+
+                        matching_columns.append({
+                            "name": column_name,
+                            "type": column_metadata.get("type", ""),
+                            "size": column_metadata.get("size"),
+                            "key": column_metadata.get("key", ""),
+                            "auto_increment": column_metadata.get(
+                                "auto_increment",
+                                False
+                            )
+                        })
+
+
+                # If this table has matching columns,
+                # add EVERY one of them to column search results
+
+                if matching_columns:
+
+                    column_matches.append({
+                        "table_name": table_name,
+                        "group": group_name,
+                        "importance": table_metadata.get(
+                            "importance",
+                            "Low"
+                        ),
+                        "description": table_description,
+                        "columns": matching_columns
+                    })
+
+
+            # -------------------------------------------------
+            # NORMAL TABLE SEARCH
+            # -------------------------------------------------
+
+            table_matches = (
+
+                not search_term
+
+                or search_lower in table_name.lower()
+
+                or search_lower in table_description.lower()
+
+                or search_lower in group_name.lower()
+
+                or bool(matching_columns)
+            )
+
+
+            if table_matches:
+
+                filtered_tables[table_name] = table_metadata
+
+
+        if filtered_tables:
+
+            groups.append({
+                "name": group_name,
+                "table_count": len(filtered_tables),
+                "tables": filtered_tables
+            })
+
+
+    # -------------------------------------------------
+    # TOTAL NUMBER OF MATCHING COLUMN OCCURRENCES
+    # -------------------------------------------------
+
+    total_column_matches = sum(
+        len(result["columns"])
+        for result in column_matches
+    )
+
+
+    return render_template(
+        "schema.html",
+        groups=groups,
+        search_term=search_term,
+        total_tables=len(schema_tables),
+        column_matches=column_matches,
+        total_column_matches=total_column_matches
+    )
+
+@app.route("/schema/<table_name>")
+def schema_table(table_name):
+    """Display complete details for one Saviynt database table."""
+
+    table_name = table_name.strip()
+
+    if table_name not in schema_tables:
+        return "Table not found", 404
+
+    columns = schema_tables[table_name]
+
+    # Find catalog metadata
+    table_metadata = None
+    table_group = None
+
+    for group_name, group_data in schema_groups.items():
+        if table_name in group_data.get("tables", {}):
+            table_metadata = group_data["tables"][table_name]
+            table_group = group_name
+            break
+
+    if table_metadata is None:
+        table_metadata = {
+            "importance": "Unknown",
+            "description": ""
+        }
+
+    primary_keys = []
+    indexed_columns = []
+
+    for column_name, metadata in columns.items():
+        key = metadata.get("key")
+
+        if key == "PRI":
+            primary_keys.append(column_name)
+
+        if key == "MUL":
+            indexed_columns.append(column_name)
+
+    related_relationships = []
+
+    for relationship in schema_relationships:
+        if (
+            relationship.get("from_table") == table_name
+            or relationship.get("to_table") == table_name
+        ):
+            related_relationships.append(relationship)
+
+    return render_template(
+        "schema_table.html",
+        table_name=table_name,
+        columns=columns,
+        metadata=table_metadata,
+        group=table_group,
+        primary_keys=primary_keys,
+        indexed_columns=indexed_columns,
+        related_relationships=related_relationships
+    )
 
 # ===============================
 # DASHBOARD
