@@ -1,343 +1,144 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<div class="schema-page">
-
-    <div class="schema-header">
-
-        <div>
-
-            <h1 class="gradient-title">
-                Saviynt Database Schema
-            </h1>
-
+<div class="schema-page schema-hub-page">
+    <header class="schema-hub-header">
+        <div class="schema-hub-heading">
+            <h1 class="gradient-title">Saviynt Database Schema</h1>
             <p class="schema-subtitle">
-                Explore {{ total_tables }} Saviynt database tables,
-                their columns, keys and functional domains.
+                Explore {{ total_tables }} Saviynt database tables, their columns, keys and functional domains.
             </p>
         </div>
 
-        <div class="schema-total-card">
-            <span class="schema-total-number">{{ total_tables }}</span>
-            <span class="schema-total-label">Tables</span>
-        </div>
+        <a class="schema-hub-search-link"
+           href="{{ url_for('schema_search') }}"
+           aria-label="Search the Saviynt database schema"
+           title="Search schema">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="10.8" cy="10.8" r="6.8"></circle>
+                <path d="m16 16 5 5"></path>
+            </svg>
+            <span>Search schema</span>
+        </a>
+    </header>
 
-    </div>
-
-
-    <!-- SEARCH -->
-
-    <form method="GET" action="{{ url_for('schema_explorer') }}" class="schema-search">
-
-        <span class="schema-search-icon">⌕</span>
-
-        <input
-            type="text"
-            name="search"
-            value="{{ search_term }}"
-            placeholder="Search tables, descriptions or domains..."
-            autocomplete="off"
-        >
-
-        {% if search_term %}
-            <a href="{{ url_for('schema_explorer') }}" class="schema-clear">
-                Clear
-            </a>
-        {% endif %}
-
-        <button type="submit">
-            Search
-        </button>
-
-    </form>
-
-
-    {% if search_term %}
-
-        <div class="schema-search-result">
-            Showing results for
-            <strong>{{ search_term }}</strong>
-        </div>
-
-    {% endif %}
-
-    {% if search_term and column_matches %}
-
-        <div class="schema-column-search-results">
-
-            <div class="column-results-header">
-
+    <section class="schema-explorer-layout" aria-label="Schema table explorer">
+        <aside class="schema-browser-pane">
+            <div class="schema-browser-header">
                 <div>
-
-                    <div class="column-results-eyebrow">
-                        COLUMN MATCHES
-                    </div>
-
-                    <h2>
-                        Attributes matching
-                        <span>{{ search_term }}</span>
-                    </h2>
-
-                    <p>
-                        Found {{ total_column_matches }}
-                        matching
-                        {% if total_column_matches == 1 %}
-                            column
-                        {% else %}
-                            columns
-                        {% endif %}
-                        across
-                        {{ column_matches|length }}
-                        {% if column_matches|length == 1 %}
-                            table
-                        {% else %}
-                            tables
-                        {% endif %}.
-                    </p>
-
+                    <h2>Tables A–Z</h2>
+                    <p>{{ total_tables }} tables</p>
                 </div>
-
+                <span class="schema-browser-count">{{ total_tables }}</span>
             </div>
 
-
-            <div class="column-results-grid">
-
-                {% for result in column_matches %}
-
-                <a
-                    href="{{ url_for('schema_table', table_name=result.table_name) }}"
-                    class="column-result-card"
-                >
-
-                    <div class="column-result-top">
-
-                        <div>
-
-                            <div class="column-result-group">
-                                {{ result.group }}
-                            </div>
-
-                            <h3>
-                                {{ result.table_name }}
-                            </h3>
-
-                        </div>
-
-
-                        <span
-                            class="importance importance-{{ result.importance|lower }}"
-                        >
-                            {{ result.importance }}
-                        </span>
-
-                    </div>
-
-
-                    <div class="column-result-columns">
-
-                        {% for column in result.columns %}
-
-                        <div class="column-result-row">
-
-                            <div class="column-result-name">
-
-                                {{ column.name }}
-
-                                {% if column.key == "PRI" %}
-
-                                    <span class="column-key-badge primary">
-                                        PK
-                                    </span>
-
-                                {% elif column.key == "MUL" %}
-
-                                    <span class="column-key-badge indexed">
-                                        INDEX
-                                    </span>
-
-                                {% endif %}
-
-                            </div>
-
-
-                            <div class="column-result-meta">
-
-                                <span>
-                                    {{ column.type }}
-                                </span>
-
-                                {% if column.size is not none %}
-
-                                    <span>
-                                        {{ column.size }}
-                                    </span>
-
-                                {% endif %}
-
-                            </div>
-
-                        </div>
-
-                        {% endfor %}
-
-                    </div>
-
-
-                    <div class="column-result-footer">
-
-                        Explore {{ result.table_name }}
-
-                        <span>→</span>
-
-                    </div>
-
-                </a>
-
+            <nav class="schema-browser-letter-nav" aria-label="Jump to table letter">
+                {% for letter in available_letters %}
+                    <a href="#schema-letter-{{ letter|lower }}">{{ letter }}</a>
                 {% endfor %}
+            </nav>
 
+            <div class="schema-browser-list" id="schemaBrowserList">
+                {% for letter_group in letter_groups %}
+                    <section class="schema-letter-section" id="schema-letter-{{ letter_group.letter|lower }}">
+                        <h3 class="schema-letter-heading">{{ letter_group.letter }}</h3>
+                        {% for table in letter_group.tables %}
+                            <a class="schema-table-item"
+                               href="{{ url_for('schema_table', table_name=table.name) }}"
+                               data-schema-table
+                               data-table-name="{{ table.name }}"
+                               title="{{ table.metadata.description or table.name }}">
+                                <span class="schema-table-item-name">{{ table.name }}</span>
+                                <span class="schema-table-item-arrow" aria-hidden="true">›</span>
+                            </a>
+                        {% endfor %}
+                    </section>
+                {% endfor %}
             </div>
+        </aside>
 
-        </div>
-
-    {% endif %}
-
-    <!-- GROUPS -->
-
-     <div class="schema-groups">
-
-    {% for group in groups %}
-
-        <section class="schema-group">
-
-            <!-- GROUP HEADER / ACCORDION BUTTON -->
-
-            <button
-                type="button"
-                class="schema-group-toggle"
-                aria-expanded="false"
-            >
-
-                <div class="schema-group-title">
-
-                            <div>
-                    <h2>{{ group.name }}</h2>
-
-                    <span class="schema-group-count">
-                        {{ group.table_count }}
-                        {% if group.table_count == 1 %}
-                            table
-                        {% else %}
-                            tables
-                        {% endif %}
-                    </span>
-
+        <section class="schema-detail-pane" id="schemaDetailPane" aria-live="polite" aria-label="Selected table details">
+            <div class="schema-detail-placeholder">
+                <div class="schema-placeholder-icon" aria-hidden="true">
+                    <svg viewBox="0 0 48 48">
+                        <ellipse cx="24" cy="10" rx="15" ry="6"></ellipse>
+                        <path d="M9 10v27c0 3.3 6.7 6 15 6s15-2.7 15-6V10"></path>
+                        <path d="M9 19c0 3.3 6.7 6 15 6s15-2.7 15-6M9 28c0 3.3 6.7 6 15 6s15-2.7 15-6"></path>
+                    </svg>
                 </div>
-
-                <span class="schema-group-arrow">
-                    →
-                </span>
-
-            </button>
-
-
-            <!-- GROUP CONTENT -->
-
-            <div class="schema-group-content">
-
-                <div class="schema-table-grid">
-
-                    {% for table_name, table in group.tables.items() %}
-
-                        <a
-                            href="{{ url_for('schema_table', table_name=table_name) }}"
-                            class="schema-card"
-                        >
-
-                            <div class="schema-card-top">
-
-                                <span class="schema-table-icon">
-                                    ⬡
-                                </span>
-
-                                <span class="importance importance-{{ table.importance|lower }}">
-                                    {{ table.importance }}
-                                </span>
-
-                            </div>
-
-                            <h3>{{ table_name }}</h3>
-
-                            <p>
-                                {{ table.description }}
-                            </p>
-
-                            <div class="schema-card-footer">
-                                Explore table
-                                <span>→</span>
-                            </div>
-
-                        </a>
-
-                    {% endfor %}
-
-                </div>
-
+                <h2>Select a table</h2>
+                <p>Choose a table from the alphabetical list to explore its description, columns, data types, keys and verified relationships.</p>
+                <span class="schema-placeholder-hint">{{ total_tables }} tables available</span>
             </div>
-
         </section>
+    </section>
 
-    {% else %}
-
-        <div class="schema-empty">
-
-            <div class="schema-empty-icon">⌕</div>
-
-            <h2>No tables found</h2>
-
-            <p>
-                Try searching for another table, domain or keyword.
-            </p>
-
-            <a href="{{ url_for('schema_explorer') }}">
-                Show all tables
-            </a>
-
+    <section class="schema-domain-section" aria-labelledby="schemaDomainHeading">
+        <div class="schema-domain-heading">
+            <div>
+                <h2 id="schemaDomainHeading">Browse by Functional Domain</h2>
+                <p>Prefer a categorized view? Explore tables grouped by their Saviynt functional area.</p>
+            </div>
+            <span class="schema-domain-count">{{ groups|length }} domains</span>
         </div>
 
-    {% endfor %}
+        <div class="schema-groups">
+            {% for group in groups %}
+                <section class="schema-group">
+                    <button type="button" class="schema-group-toggle" aria-expanded="false">
+                        <div class="schema-group-title">
+                            <div>
+                                <h2>{{ group.name }}</h2>
+                                <span class="schema-group-count">
+                                    {{ group.table_count }}
+                                    {% if group.table_count == 1 %}table{% else %}tables{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <span class="schema-group-arrow" aria-hidden="true">→</span>
+                    </button>
 
-</div>   
-
+                    <div class="schema-group-content">
+                        <div class="schema-table-grid">
+                            {% for table_name, table in group.tables.items() %}
+                                <a href="{{ url_for('schema_table', table_name=table_name) }}" class="schema-card">
+                                    <div class="schema-card-top">
+                                        <span class="schema-table-icon" aria-hidden="true">⬡</span>
+                                        <span class="importance importance-{{ table.importance|default('Unknown')|lower }}">
+                                            {{ table.importance|default('Unknown') }}
+                                        </span>
+                                    </div>
+                                    <h3>{{ table_name }}</h3>
+                                    <p>{{ table.description or "No description available." }}</p>
+                                    <div class="schema-card-footer">Open full table page <span>→</span></div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </section>
+            {% else %}
+                <div class="schema-empty">
+                    <h2>No functional domains available</h2>
+                    <p>The alphabetical table explorer above remains available.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
 </div>
 
+<script src="{{ url_for('static', filename='schema.js') }}" defer></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-
     const toggles = document.querySelectorAll(".schema-group-toggle");
-
     toggles.forEach(function (toggle) {
-
         toggle.addEventListener("click", function () {
-
-            const isOpen =
-                this.getAttribute("aria-expanded") === "true";
-
-            /* Close every group */
-            toggles.forEach(function (otherToggle) {
-                otherToggle.setAttribute("aria-expanded", "false");
+            const wasOpen = this.getAttribute("aria-expanded") === "true";
+            toggles.forEach(function (other) {
+                other.setAttribute("aria-expanded", "false");
             });
-
-            /* Open clicked group if it was previously closed */
-            if (!isOpen) {
-                this.setAttribute("aria-expanded", "true");
-            }
-
+            if (!wasOpen) this.setAttribute("aria-expanded", "true");
         });
-
     });
-
 });
 </script>
-
 {% endblock %}

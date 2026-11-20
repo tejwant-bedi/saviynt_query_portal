@@ -140,132 +140,131 @@ schema_groups = schema_catalog.get("groups", {})
 
 @app.route("/schema")
 def schema_explorer():
+    """Main schema workspace: alphabetical table browser and domain groups."""
 
-    search_term = request.args.get("search", "").strip()
-    search_lower = search_term.lower()
+    # Keep old schema-search URLs working, but move the experience to its
+    # dedicated schema-only search page.
+    legacy_search = request.args.get("search", "").strip()
+    if legacy_search:
+        return redirect(url_for("schema_search", q=legacy_search))
 
+    table_metadata_by_name = {}
+    table_group_by_name = {}
     groups = []
 
-    # Every matching column across every table
-    column_matches = []
-
-
     for group_name, group_data in schema_groups.items():
+        group_tables = group_data.get("tables", {})
+        groups.append({
+            "name": group_name,
+            "table_count": len(group_tables),
+            "tables": group_tables,
+        })
 
-        filtered_tables = {}
+        for table_name, metadata in group_tables.items():
+            table_metadata_by_name[table_name] = metadata
+            table_group_by_name[table_name] = group_name
 
-        for table_name, table_metadata in group_data.get("tables", {}).items():
+    table_entries = []
+    for table_name in sorted(schema_tables, key=str.casefold):
+        table_entries.append({
+            "name": table_name,
+            "metadata": table_metadata_by_name.get(table_name, {
+                "importance": "Unknown",
+                "description": "",
+            }),
+            "group": table_group_by_name.get(table_name, "DATABASE TABLE"),
+        })
 
-            table_description = table_metadata.get("description", "")
+    grouped_by_letter = {}
+    for table in table_entries:
+        letter = table["name"][0].upper() if table["name"] else "#"
+        grouped_by_letter.setdefault(letter, []).append(table)
 
-            # Get every column for this table
-            table_columns = schema_tables.get(table_name, {})
-
-
-            # -------------------------------------------------
-            # FIND EVERY MATCHING COLUMN
-            # -------------------------------------------------
-
-            matching_columns = []
-
-            if search_term:
-
-                for column_name, column_metadata in table_columns.items():
-
-                    if search_lower in column_name.lower():
-
-                        matching_columns.append({
-                            "name": column_name,
-                            "type": column_metadata.get("type", ""),
-                            "size": column_metadata.get("size"),
-                            "key": column_metadata.get("key", ""),
-                            "auto_increment": column_metadata.get(
-                                "auto_increment",
-                                False
-                            )
-                        })
-
-
-                # If this table has matching columns,
-                # add EVERY one of them to column search results
-
-                if matching_columns:
-
-                    column_matches.append({
-                        "table_name": table_name,
-                        "group": group_name,
-                        "importance": table_metadata.get(
-                            "importance",
-                            "Low"
-                        ),
-                        "description": table_description,
-                        "columns": matching_columns
-                    })
-
-
-            # -------------------------------------------------
-            # NORMAL TABLE SEARCH
-            # -------------------------------------------------
-
-            table_matches = (
-
-                not search_term
-
-                or search_lower in table_name.lower()
-
-                or search_lower in table_description.lower()
-
-                or search_lower in group_name.lower()
-
-                or bool(matching_columns)
-            )
-
-
-            if table_matches:
-
-                filtered_tables[table_name] = table_metadata
-
-
-        if filtered_tables:
-
-            groups.append({
-                "name": group_name,
-                "table_count": len(filtered_tables),
-                "tables": filtered_tables
-            })
-
-
-    # -------------------------------------------------
-    # TOTAL NUMBER OF MATCHING COLUMN OCCURRENCES
-    # -------------------------------------------------
-
-    total_column_matches = sum(
-        len(result["columns"])
-        for result in column_matches
-    )
-
+    letter_groups = [
+        {"letter": letter, "tables": grouped_by_letter[letter]}
+        for letter in sorted(grouped_by_letter)
+    ]
 
     return render_template(
         "schema.html",
         groups=groups,
-        search_term=search_term,
         total_tables=len(schema_tables),
-        column_matches=column_matches,
-        total_column_matches=total_column_matches
+        table_entries=table_entries,
+        letter_groups=letter_groups,
+        available_letters=[item["letter"] for item in letter_groups],
     )
 
-@app.route("/schema/<table_name>")
-def schema_table(table_name):
-    """Display complete details for one Saviynt database table."""
 
-    table_name = table_name.strip()
+@app.route("/schema/search")
+def schema_search():
+    """Search schema tables, columns, descriptions and functional domains."""
 
-    if table_name not in schema_tables:
-        return "Table not found", 404
+    search_term = request.args.get("q", request.args.get("search", "")).strip()
+    search_lower = search_term.casefold()
+    results = []
+
+    if search_term:
+        table_metadata_by_name = {}
+        table_group_by_name = {}
+
+        for group_name, group_data in schema_groups.items():
+            for table_name, metadata in group_data.get("tables", {}).items():
+                table_metadata_by_name[table_name] = metadata
+                table_group_by_name[table_name] = group_name
+
+        for table_name in sorted(schema_tables, key=str.casefold):
+            metadata = table_metadata_by_name.get(table_name, {
+                "importance": "Unknown",
+                "description": "",
+            })
+            group_name = table_group_by_name.get(table_name, "DATABASE TABLE")
+            description = metadata.get("description", "") or ""
+            columns = schema_tables.get(table_name, {})
+
+            matching_columns = []
+            for column_name, column_metadata in columns.items():
+                if search_lower in column_name.casefold():
+                    matching_columns.append({
+                        "name": column_name,
+                        "type": column_metadata.get("type", ""),
+                        "size": column_metadata.get("size"),
+                        "key": column_metadata.get("key", ""),
+                        "auto_increment": column_metadata.get("auto_increment", False),
+                    })
+
+            match_reasons = []
+            if search_lower in table_name.casefold():
+                match_reasons.append("Table name")
+            if search_lower in description.casefold():
+                match_reasons.append("Description")
+            if search_lower in group_name.casefold():
+                match_reasons.append("Functional domain")
+            if matching_columns:
+                match_reasons.append("Column name")
+
+            if match_reasons:
+                results.append({
+                    "table_name": table_name,
+                    "group": group_name,
+                    "importance": metadata.get("importance", "Unknown"),
+                    "description": description,
+                    "match_reasons": match_reasons,
+                    "columns": matching_columns,
+                })
+
+    return render_template(
+        "schema_search.html",
+        search_term=search_term,
+        results=results,
+        total_tables=len(schema_tables),
+        total_column_matches=sum(len(result["columns"]) for result in results),
+    )
+
+
+def get_schema_table_context(table_name):
+    """Build the shared detail context used by full-page and inline views."""
 
     columns = schema_tables[table_name]
-
-    # Find catalog metadata
     table_metadata = None
     table_group = None
 
@@ -278,39 +277,58 @@ def schema_table(table_name):
     if table_metadata is None:
         table_metadata = {
             "importance": "Unknown",
-            "description": ""
+            "description": "",
         }
 
     primary_keys = []
     indexed_columns = []
-
     for column_name, metadata in columns.items():
-        key = metadata.get("key")
-
-        if key == "PRI":
+        if metadata.get("key") == "PRI":
             primary_keys.append(column_name)
-
-        if key == "MUL":
+        if metadata.get("key") == "MUL":
             indexed_columns.append(column_name)
 
-    related_relationships = []
-
-    for relationship in schema_relationships:
+    related_relationships = [
+        relationship for relationship in schema_relationships
         if (
             relationship.get("from_table") == table_name
             or relationship.get("to_table") == table_name
-        ):
-            related_relationships.append(relationship)
+        )
+    ]
+
+    return {
+        "table_name": table_name,
+        "columns": columns,
+        "metadata": table_metadata,
+        "group": table_group,
+        "primary_keys": primary_keys,
+        "indexed_columns": indexed_columns,
+        "related_relationships": related_relationships,
+    }
+
+
+@app.route("/schema/<table_name>")
+def schema_table(table_name):
+    """Display a table as a full page or as reusable inline detail HTML."""
+
+    table_name = table_name.strip()
+    if table_name not in schema_tables:
+        return "Table not found", 404
+
+    context = get_schema_table_context(table_name)
+    inline_mode = request.args.get("partial") == "1"
+
+    if inline_mode:
+        return render_template(
+            "schema_table_detail.html",
+            inline_mode=True,
+            **context,
+        )
 
     return render_template(
         "schema_table.html",
-        table_name=table_name,
-        columns=columns,
-        metadata=table_metadata,
-        group=table_group,
-        primary_keys=primary_keys,
-        indexed_columns=indexed_columns,
-        related_relationships=related_relationships
+        inline_mode=False,
+        **context,
     )
 
 # ===============================

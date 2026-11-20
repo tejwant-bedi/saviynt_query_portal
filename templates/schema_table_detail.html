@@ -1,0 +1,449 @@
+<div class="schema-detail-content {% if inline_mode %}schema-detail-inline{% else %}schema-detail-full{% endif %}" data-schema-detail>
+<!-- TABLE HEADER -->
+
+    <div class="table-detail-header">
+
+        <div>
+
+            <div class="schema-eyebrow">
+                {{ group or "DATABASE TABLE" }}
+            </div>
+
+            <h1 class="gradient-title">
+                {{ table_name }}
+            </h1>
+
+            <p class="table-description">
+                {{ metadata.description }}
+            </p>
+
+        </div>
+
+
+        <div class="schema-detail-header-actions">
+            <div class="table-importance importance-{{ metadata.importance|lower }}">
+                {{ metadata.importance }}
+            </div>
+            {% if inline_mode %}
+                <a href="{{ url_for('schema_table', table_name=table_name) }}"
+                   class="schema-open-full-page"
+                   title="Open full table page"
+                   aria-label="Open {{ table_name }} in its full page">↗</a>
+            {% endif %}
+        </div>
+
+    </div>
+
+
+{% if not inline_mode %}
+    <!-- TABLE STATS -->
+
+    <div class="table-stats">
+
+        <div class="table-stat">
+            <span class="table-stat-value">
+                {{ columns|length }}
+            </span>
+            <span class="table-stat-label">
+                Columns
+            </span>
+        </div>
+
+        <div class="table-stat">
+            <span class="table-stat-value">
+                {{ primary_keys|length }}
+            </span>
+            <span class="table-stat-label">
+                Primary Keys
+            </span>
+        </div>
+
+        <div class="table-stat">
+            <span class="table-stat-value">
+                {{ indexed_columns|length }}
+            </span>
+            <span class="table-stat-label">
+                Indexed
+            </span>
+        </div>
+
+    </div>
+
+{% endif %}
+
+    <!-- COLUMNS -->
+
+    <details class="schema-columns-section schema-collapsible-section" {% if inline_mode %}open{% endif %}>
+
+        <summary class="schema-section-heading schema-collapsible-header">
+
+            <div>
+                <h2>Columns</h2>
+
+                <p>
+                    Complete column definition for
+                    <code>{{ table_name }}</code>
+                </p>
+            </div>
+
+            <div class="schema-collapsible-right">
+
+                <span class="schema-collapsible-count">
+                    {{ columns|length }}
+                    {% if columns|length == 1 %}
+                        column
+                    {% else %}
+                        columns
+                    {% endif %}
+                </span>
+
+                <span class="schema-collapsible-arrow">›</span>
+
+            </div>
+
+        </summary>
+
+
+        <!-- COLUMN SEARCH -->
+
+        <div class="column-search-wrapper">
+
+            <span class="column-search-icon">⌕</span>
+
+            <input
+                type="text"
+                class="column-search-input"
+                placeholder="Search columns..."
+                autocomplete="off"
+            >
+
+            <span
+                class="column-search-count"
+            >
+                {{ columns|length }}
+            </span>
+
+        </div>
+
+
+        <div class="schema-column-table-wrapper">
+
+            <table class="schema-column-table">
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Column</th>
+                        <th>Data Type</th>
+                        <th>Size</th>
+                        <th>Key</th>
+                        <th>Auto Increment</th>
+                    </tr>
+                </thead>
+
+                <tbody class="schema-column-table-body">
+
+                    {% for column_name, column in columns.items() %}
+
+                        <tr class="column-row">
+
+                            <td class="column-number">
+                                {{ loop.index }}
+                            </td>
+
+
+                            <!-- COLUMN NAME -->
+
+                            <td class="column-name">
+
+                                <button
+                                    type="button"
+                                    class="column-copy"
+                                    data-column="{{ column_name }}"
+                                    title="Click to copy"
+                                >
+                                    <span class="column-name-text">
+                                        {{ column_name }}
+                                    </span>
+
+                                    <span class="copy-icon">
+                                        ⧉
+                                    </span>
+                                </button>
+
+
+                                {% if column.key == "PRI" %}
+
+                                    <span class="column-key-badge primary">
+                                        PK
+                                    </span>
+
+                                {% elif column.key == "MUL" %}
+
+                                    <span class="column-key-badge indexed">
+                                        INDEX
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- DATA TYPE -->
+
+                            <td>
+
+                                <span class="data-type">
+                                    {{ column.type }}
+                                </span>
+
+                            </td>
+
+
+                            <!-- SIZE -->
+
+                            <td>
+
+                                {% if column.size is defined %}
+                                    {{ column.size }}
+                                {% else %}
+                                    —
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- KEY -->
+
+                            <td>
+
+                                {% if column.key == "PRI" %}
+
+                                    <span class="key-badge primary">
+                                        PRI
+                                    </span>
+
+                                {% elif column.key == "MUL" %}
+
+                                    <span class="key-badge indexed">
+                                        MUL
+                                    </span>
+
+                                {% elif column.key %}
+
+                                    <span class="key-badge">
+                                        {{ column.key }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- AUTO INCREMENT -->
+
+                            <td>
+
+                                {% if column.auto_increment %}
+
+                                    <span class="auto-badge">
+                                        ✓
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+
+                    <!-- NO RESULTS -->
+
+                    <tr
+                        class="no-column-results"
+                        style="display: none;"
+                    >
+
+                        <td colspan="6">
+
+                            <div class="no-results-content">
+
+                                <span class="no-results-icon">
+                                    ⌕
+                                </span>
+
+                                <strong>No columns found</strong>
+
+                                <span>
+                                    Try a different search term.
+                                </span>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </details>
+    <!-- RELATED TABLES -->
+
+    {% if related_relationships %}
+
+    <details class="schema-relationships-section schema-collapsible-section">
+
+        <summary class="schema-section-heading schema-collapsible-header">
+
+            <div>
+                <h2>Related Tables</h2>
+
+                <p>
+                    Verified relationships connected to
+                    <code>{{ table_name }}</code>
+                </p>
+            </div>
+
+            <div class="schema-collapsible-right">
+
+                <div class="relationship-count">
+                    {{ related_relationships|length }}
+                    {% if related_relationships|length == 1 %}
+                        relationship
+                    {% else %}
+                        relationships
+                    {% endif %}
+                </div>
+
+                <span class="schema-collapsible-arrow">›</span>
+
+            </div>
+
+        </summary>
+
+
+        <div class="relationship-grid">
+
+            {% for relationship in related_relationships %}
+
+                {% if relationship.from_table == table_name %}
+
+                    {% set related_table = relationship.to_table %}
+                    {% set current_column = relationship.from_column %}
+                    {% set related_column = relationship.to_column %}
+                    {% set direction = "outgoing" %}
+
+                {% else %}
+
+                    {% set related_table = relationship.from_table %}
+                    {% set current_column = relationship.to_column %}
+                    {% set related_column = relationship.from_column %}
+                    {% set direction = "incoming" %}
+
+                {% endif %}
+
+
+                <div class="relationship-card">
+
+                    <div class="relationship-card-top">
+
+                        <div class="relationship-type">
+                            {{ relationship.relationship_type
+                                | replace("_", " ")
+                                | title }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="relationship-path">
+
+                        <div class="relationship-node current">
+
+                            <span class="relationship-table">
+                                {{ table_name }}
+                            </span>
+
+                            <span class="relationship-column">
+                                {{ current_column }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="relationship-connector">
+
+                            <span class="relationship-line"></span>
+
+                            <span class="relationship-arrowhead"></span>
+
+                        </div>
+
+
+                        <a
+                            href="{{ url_for('schema_table', table_name=related_table) }}"
+                            class="relationship-node related"
+                            {% if inline_mode %}data-schema-inline-link{% endif %}
+                            data-table-name="{{ related_table }}"
+                        >
+
+                            <span class="relationship-table">
+                                {{ related_table }}
+                            </span>
+
+                            <span class="relationship-column">
+                                {{ related_column }}
+                            </span>
+
+                        </a>
+
+                    </div>
+
+
+                    <p class="relationship-description">
+                        {{ relationship.description }}
+                    </p>
+
+                    <div class="relationship-footer">
+
+                        <a
+                            href="{{ url_for('schema_table', table_name=related_table) }}"
+                            class="explore-related-link"
+                            {% if inline_mode %}data-schema-inline-link{% endif %}
+                            data-table-name="{{ related_table }}"
+                        >
+                            Explore {{ related_table }}
+                            <span>→</span>
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </details>
+
+    {% endif %}
+
+    </div>
